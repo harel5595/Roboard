@@ -61,14 +61,101 @@ int(*MySendAngularTorqueCommand)(float Command[COMMAND_SIZE]);
 int(*MySendCartesianForceCommand)(float Command[COMMAND_SIZE]);
 
 
-
-
-
-
-
-int main(void)
+/*
+* This func create TrajectoryPoint from Cartesian values.
+* REMEMBER to free the pointer after use.
+*/
+TrajectoryPoint * CartesianToPoint(float x, float y, float z)
 {
-	int programResult, result;
+	TrajectoryPoint * start = new TrajectoryPoint;
+	start->InitStruct();
+
+	UserPosition  point = UserPosition();
+	point.InitStruct();
+	point.Type = CARTESIAN_POSITION;
+	CartesianInfo pos = CartesianInfo();
+	pos.X = x;
+	pos.Y = y;
+	pos.Z = z;
+	//pos.ThetaX = -1.7;
+	//pos.ThetaY = 0.021;
+	//pos.ThetaZ = -2.58;
+	//point.Fingers.Finger1 = 4896;
+	//point.Fingers.Finger2 = 4896;
+	//point.Fingers.Finger3 = 4962;
+
+
+
+	point.CartesianPosition = pos;
+	start->Position = point;
+	return start;
+}
+
+
+/*
+* This func create TrajectoryPoint from Cartesian values.
+* REMEMBER to free the pointer after use.
+*/
+TrajectoryPoint* CartesianToPoint(float x, float y, float z, float thetaX, float thetaY, float thetaZ)
+{
+	TrajectoryPoint* start = new TrajectoryPoint;
+	start->InitStruct();
+
+	UserPosition  point = UserPosition();
+	point.InitStruct();
+	point.Type = CARTESIAN_POSITION;
+	CartesianInfo pos = CartesianInfo();
+	pos.X = x;
+	pos.Y = y;
+	pos.Z = z;
+	pos.ThetaX = thetaX;
+	pos.ThetaY = thetaY;
+	pos.ThetaZ = thetaZ;
+	//point.Fingers.Finger1 = 4896;
+	//point.Fingers.Finger2 = 4896;
+	//point.Fingers.Finger3 = 4962;
+
+
+
+	point.CartesianPosition = pos;
+	start->Position = point;
+	return start;
+}
+
+
+/*
+* This func create TrajectoryPoint from Cartesian values.
+* finger3 is the finger that alone in the hand.
+* REMEMBER to free the pointer after use.
+*/
+TrajectoryPoint* CartesianToPoint(float x, float y, float z, float thetaX, float thetaY, float thetaZ, float finger1, float finger2, float finger3)
+{
+	TrajectoryPoint* start = new TrajectoryPoint;
+	start->InitStruct();
+
+	UserPosition  point = UserPosition();
+	point.InitStruct();
+	point.Type = CARTESIAN_POSITION;
+	CartesianInfo pos = CartesianInfo();
+	pos.X = x;
+	pos.Y = y;
+	pos.Z = z;
+	pos.ThetaX = thetaX;
+	pos.ThetaY = thetaY;
+	pos.ThetaZ = thetaZ;
+	point.Fingers.Finger1 = finger1;
+	point.Fingers.Finger2 = finger2;
+	point.Fingers.Finger3 = finger3;
+
+	point.CartesianPosition = pos;
+	start->Position = point;
+	return start;
+}
+
+
+int initRobotAPI()
+{
+	int result;
 	commandLayer_handle = LoadLibrary(L"CommandLayerWindows.dll");
 
 	MyInitAPI = (int(*)()) GetProcAddress(commandLayer_handle, "InitAPI");
@@ -100,7 +187,7 @@ int main(void)
 		|| (MySetActiveDevice == NULL) || (MyStartForceControl == NULL))
 	{
 		cout << "* * *  E R R O R   D U R I N G   I N I T I A L I Z A T I O N  * * *" << endl;
-		programResult = 0;
+		return 0;
 	}
 	else
 	{
@@ -133,7 +220,55 @@ int main(void)
 
 		}
 	}
-	//MySendBasicTrajectory = (int(*)(TrajectoryPoint)) GetProcAddress(commandLayer_handle, "SendBasicTrajectory");
+	return 1;
+}
+
+void waitUntilGetToPoint(float x, float y, float z)
+{
+	//CartesianPosition pos = MyGetCartesianForce();
+}
+
+
+void mainLoopForDraw()
+{
+	bool finishDraw = false;
+	while (!finishDraw)
+	{
+		// call eyal func
+
+		// pass params to jonathan func
+
+		// use the result to move the robot 
+
+		// wait until the robot arives
+	}
+}
+
+
+void disconnectFromRobot()
+{
+	CloseAPI();
+}
+
+
+
+
+int main(void)
+{
+	int programResult, result;
+
+	if (!initRobotAPI())
+		return 1;
+
+	MyMoveHome();
+	MyInitFingers();
+	
+
+	mainLoopForDraw();
+
+	disconnectFromRobot();
+
+	/*
 	TrajectoryPoint start;
 	start.InitStruct();
 	
@@ -178,28 +313,6 @@ int main(void)
 	end_pos.CartesianPosition = end_pos_info;
 	end.Position = end_pos;
 
-
-
-	/*TrajectoryPoint y;
-	y.InitStruct();
-
-	UserPosition point_y = UserPosition();
-	point_y.InitStruct();
-	point_y.Type = CARTESIAN_POSITION;
-	CartesianInfo pos_y;
-	pos_y.X = 0.3547;
-	pos_y.Y = 0.29;
-	pos_y.Z = 0.56;
-	pos_y.ThetaX = -1.57;
-	pos_y.ThetaY = -0.21;
-	pos_y.ThetaZ = -0.4159;
-
-
-	point_y.CartesianPosition = pos_y;
-	y.Position = point_y;*/
-
-
-	MyMoveHome();
 	//MyInitFingers();
 
 
@@ -231,6 +344,6 @@ int main(void)
 	MySendBasicTrajectory(start);
 	Sleep(10000);
 	MySendBasicTrajectory(end);
-	
+	*/
 
 }
