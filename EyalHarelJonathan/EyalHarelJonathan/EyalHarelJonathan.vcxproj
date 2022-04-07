@@ -144,11 +144,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\first_move.cpp" />
+    <ClCompile Include="..\..\lineMath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CommandLayer.h" />
     <ClInclude Include="..\..\CommunicationLayer.h" />
     <ClInclude Include="..\..\linalg.h" />
+    <ClInclude Include="..\..\lineMath.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\CommandLayerEthernet.dll" />
