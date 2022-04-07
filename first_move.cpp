@@ -19,6 +19,7 @@
 #include "CommandLayer.h"
 #include <conio.h>
 #include <iomanip>
+#include "lineMath.h"
 #endif
 
 using namespace linalg::aliases;
@@ -229,25 +230,39 @@ void waitUntilGetToPoint(float x, float y, float z)
 }
 
 
-void mainLoopForDraw()
+void mainLoopForDrawLine(vector<float3> line)
 {
 	bool finishDraw = false;
-	while (!finishDraw)
+	cout << line[0] << endl << line[1] << endl;
+	//return ;
+	for (int i = 0; i < 30; i++)
 	{
-		// call eyal func
+		float3 point = line[0] + (line[1] - line[0]) * i / 30;
+
+		TrajectoryPoint* pos = CartesianToPoint(point.x, point.y, point.z, -1.7, -0.1215, -2.593);
+		MySendBasicTrajectory(*pos);
+		free(pos);
+		Sleep(10);
+	}
+																										  
+	//while (!finishDraw)
+	//{
+
+		
+		
 
 		// pass params to jonathan func
 
 		// use the result to move the robot 
 
 		// wait until the robot arives
-	}
+	//}
 }
 
 
 void disconnectFromRobot()
 {
-	CloseAPI();
+	MyCloseAPI();
 }
 
 
@@ -257,14 +272,17 @@ int main(void)
 {
 	int programResult, result;
 
-	if (!initRobotAPI())
+    if (!initRobotAPI())
 		return 1;
 
 	MyMoveHome();
 	MyInitFingers();
 	
+	vector<float3> line = getLine(LEFT_DOWN, RIGHT_DOWN, LEFT_UP, float2{ 1, 0.0 }, float2{ 1,0.4 }); // call eyal func
+	mainLoopForDrawLine(line);
 
-	mainLoopForDraw();
+	line = getLine(LEFT_DOWN, RIGHT_DOWN, LEFT_UP, float2{ 1, 0.4 }, float2{ 0,0.4 }); // call eyal func
+	mainLoopForDrawLine(line);
 
 	disconnectFromRobot();
 
