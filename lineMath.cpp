@@ -21,8 +21,8 @@ vector<float3> getLine(float3 baseBoard, float3 XBoard, float3 YBoard, float2 po
 	vector<float3> positions;
 	float3 pos1 = (pos1_2D.x * e1) + (pos1_2D.y * e2);
 	float3 pos2 = (pos2_2D.x * e1) + (pos2_2D.y * e2);
-	positions.push_back(pos1);
-	positions.push_back(pos2);
+	positions.push_back(baseBoard + pos1);
+	positions.push_back(baseBoard + pos2);
 	return positions;
 	
 }
