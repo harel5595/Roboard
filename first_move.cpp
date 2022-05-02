@@ -112,9 +112,9 @@ TrajectoryPoint* CartesianToPoint(float x, float y, float z, float thetaX, float
 	pos.ThetaX = thetaX;
 	pos.ThetaY = thetaY;
 	pos.ThetaZ = thetaZ;
-	//point.Fingers.Finger1 = 4896;
-	//point.Fingers.Finger2 = 4896;
-	//point.Fingers.Finger3 = 4962;
+	point.Fingers.Finger1 = 6596;
+	point.Fingers.Finger2 = 6596;
+	point.Fingers.Finger3 = 6562;
 
 
 
@@ -226,30 +226,44 @@ int initRobotAPI()
 
 void waitUntilGetToPoint(float x, float y, float z)
 {
+	//while()
+
 	//CartesianPosition pos = MyGetCartesianForce();
 }
 
 float3 nextPointByForce(float3 force, float3 nextPoint, float3 nowForce, float3 normalBoard)
 {
-	float3 force_diff = nowForce - force; //difference between what we want and what we have
-	if (length(nowForce) > 15)
+	
+	float3 force_diff = force - nowForce; //difference between what we want and what we have
+	if (length(nowForce) > 11)
 	{
 		perror("too much force");
 		exit(1);
 	}
-	float3 force_corr= dot(force_diff, normalBoard) * normalBoard; //force correction, how much to move in the direction of the normal.
+	float3 force_corr = dot(force_diff, normalBoard) * normalBoard * float3 { 0.02, 0.02, 0.02 }; //force correction, how much to move in the direction of the normal.
+	cout <<"curr force:     " << length(nowForce) << "      curr_correction:   " << force_corr << endl;
 	return nextPoint + force_corr;
 }
 
 
-void mainLoopForDrawLine(vector<float3> line)
+void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 {
 	bool finishDraw = false;
 	cout << line[0] << endl << line[1] << endl;
 	//return ;
-	for (int i = 0; i < 30; i++)
-	{
-		float3 point = line[0] + (line[1] - line[0]) * i / 30;
+	TrajectoryPoint* pos = CartesianToPoint(line[0].x, line[0].y, line[0].z, -1.7, -0.1215, -2.593);
+	MySendBasicTrajectory(*pos);
+	free(pos);
+	Sleep(7000);
+	cout << "Start the loop!" << endl;
+	for(auto point: line){
+		//float3 force;
+		CartesianPosition force;
+		MyGetCartesianForce(force);
+
+		float3 wanted_force = float3{4.3,6,1.6};
+
+		point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
 
 		TrajectoryPoint* pos = CartesianToPoint(point.x, point.y, point.z, -1.7, -0.1215, -2.593);
 		MySendBasicTrajectory(*pos);
@@ -289,12 +303,14 @@ int main(void)
 
 	MyMoveHome();
 	MyInitFingers();
-	
-	vector<float3> line = getLine(LEFT_DOWN, RIGHT_DOWN, LEFT_UP, float2{ 1, 0.0 }, float2{ 1,0.4 }); // call eyal func
-	mainLoopForDrawLine(line);
+	//Sleep(1000);
+	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 
-	line = getLine(LEFT_DOWN, RIGHT_DOWN, LEFT_UP, float2{ 1, 0.4 }, float2{ 0,0.4 }); // call eyal func
-	mainLoopForDrawLine(line);
+	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1, 0.0 }, float2{ 1,2 }, 3000); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+
+	//line = getLine(, float2{ 1, 0.4 }, float2{ 0,0.4 }); // call eyal func
+	//mainLoopForDrawLine(line);
 
 	disconnectFromRobot();
 
