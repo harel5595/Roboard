@@ -255,7 +255,7 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 	{
 		CartesianPosition force;
 		MyGetCartesianPosition(force);
-		point = nextPointByForce(wanted_force,point,force,normalBoard);
+		point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
 		TrajectoryPoint* pos = CartesianToPoint(point.x, point.y, point.z, -1.7, -0.1215, -2.593);
 		MySendBasicTrajectory(*pos);
 		free(pos);
