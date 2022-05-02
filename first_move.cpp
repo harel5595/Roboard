@@ -226,7 +226,7 @@ int initRobotAPI()
 	return 1;
 }
 
-void waitUntilGetToPoint(float x, float y, float z)
+void waitUntilGetToPoint(float3 wanted_pos)
 {
 	//CartesianPosition pos = MyGetCartesianForce();
 }
@@ -250,7 +250,7 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 	bool finishDraw = false;
 	cout << line[0] << endl << line[1] << endl;
 	//return ;
-	float3 wanted_force = float3{};
+	float3 wanted_force = float3{-5,13,-1 };
 	for (auto point : line)
 	{
 		CartesianPosition force;
