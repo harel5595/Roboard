@@ -22,6 +22,8 @@
 #include "lineMath.h"
 #endif
 
+#define MAX_FORCE 17
+
 using namespace linalg::aliases;
 using namespace linalg::ostream_overloads;
 
@@ -112,9 +114,9 @@ TrajectoryPoint* CartesianToPoint(float x, float y, float z, float thetaX, float
 	pos.ThetaX = thetaX;
 	pos.ThetaY = thetaY;
 	pos.ThetaZ = thetaZ;
-	point.Fingers.Finger1 = 6596;
-	point.Fingers.Finger2 = 6596;
-	point.Fingers.Finger3 = 6562;
+	point.Fingers.Finger1 = 6896;
+	point.Fingers.Finger2 = 6896;
+	point.Fingers.Finger3 = 6862;
 
 
 
@@ -235,7 +237,7 @@ float3 nextPointByForce(float3 force, float3 nextPoint, float3 nowForce, float3 
 {
 	
 	float3 force_diff = force - nowForce; //difference between what we want and what we have
-	if (length(nowForce) > 11)
+	if (length(nowForce) > MAX_FORCE)
 	{
 		perror("too much force");
 		exit(1);
@@ -306,7 +308,7 @@ int main(void)
 	//Sleep(1000);
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 
-	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1, 0.0 }, float2{ 1,2 }, 3000); // call eyal func
+	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.0 }, float2{ 2.0,2.0 }, 3000); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
 
 	//line = getLine(, float2{ 1, 0.4 }, float2{ 0,0.4 }); // call eyal func
