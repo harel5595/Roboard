@@ -114,9 +114,15 @@ TrajectoryPoint* CartesianToPoint(float x, float y, float z, float thetaX, float
 	pos.ThetaX = thetaX;
 	pos.ThetaY = thetaY;
 	pos.ThetaZ = thetaZ;
+<<<<<<< HEAD
 	point.Fingers.Finger1 = 6896;
 	point.Fingers.Finger2 = 6896;
 	point.Fingers.Finger3 = 6862;
+=======
+	//point.Fingers.Finger1 = 4896;
+	//point.Fingers.Finger2 = 4896;
+	//point.Fingers.Finger3 = 4962;
+>>>>>>> f5ccf870fc9cba2fcddeb4715441c9342f54eae8
 
 
 
@@ -228,11 +234,10 @@ int initRobotAPI()
 
 void waitUntilGetToPoint(float x, float y, float z)
 {
-	//while()
-
 	//CartesianPosition pos = MyGetCartesianForce();
 }
 
+<<<<<<< HEAD
 float3 nextPointByForce(float3 force, float3 nextPoint, float3 nowForce, float3 normalBoard)
 {
 	
@@ -246,26 +251,17 @@ float3 nextPointByForce(float3 force, float3 nextPoint, float3 nowForce, float3 
 	cout <<"curr force:     " << length(nowForce) << "      curr_correction:   " << force_corr << endl;
 	return nextPoint + force_corr;
 }
+=======
+>>>>>>> f5ccf870fc9cba2fcddeb4715441c9342f54eae8
 
-
-void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
+void mainLoopForDrawLine(vector<float3> line)
 {
 	bool finishDraw = false;
 	cout << line[0] << endl << line[1] << endl;
 	//return ;
-	TrajectoryPoint* pos = CartesianToPoint(line[0].x, line[0].y, line[0].z, -1.7, -0.1215, -2.593);
-	MySendBasicTrajectory(*pos);
-	free(pos);
-	Sleep(7000);
-	cout << "Start the loop!" << endl;
-	for(auto point: line){
-		//float3 force;
-		CartesianPosition force;
-		MyGetCartesianForce(force);
-
-		float3 wanted_force = float3{4.3,6,1.6};
-
-		point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
+	for (int i = 0; i < 30; i++)
+	{
+		float3 point = line[0] + (line[1] - line[0]) * i / 30;
 
 		TrajectoryPoint* pos = CartesianToPoint(point.x, point.y, point.z, -1.7, -0.1215, -2.593);
 		MySendBasicTrajectory(*pos);
@@ -276,7 +272,7 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 	//while (!finishDraw)
 	//{
 
-	
+		
 		
 
 		// pass params to jonathan func
@@ -305,14 +301,20 @@ int main(void)
 
 	MyMoveHome();
 	MyInitFingers();
+<<<<<<< HEAD
 	//Sleep(1000);
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 
 	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.0 }, float2{ 2.0,2.0 }, 3000); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
+=======
+	
+	vector<float3> line = getLine(LEFT_DOWN, RIGHT_DOWN, LEFT_UP, float2{ 1, 0.0 }, float2{ 1,0.4 }); // call eyal func
+	mainLoopForDrawLine(line);
+>>>>>>> f5ccf870fc9cba2fcddeb4715441c9342f54eae8
 
-	//line = getLine(, float2{ 1, 0.4 }, float2{ 0,0.4 }); // call eyal func
-	//mainLoopForDrawLine(line);
+	line = getLine(LEFT_DOWN, RIGHT_DOWN, LEFT_UP, float2{ 1, 0.4 }, float2{ 0,0.4 }); // call eyal func
+	mainLoopForDrawLine(line);
 
 	disconnectFromRobot();
 
