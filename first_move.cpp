@@ -229,6 +229,18 @@ void waitUntilGetToPoint(float x, float y, float z)
 	//CartesianPosition pos = MyGetCartesianForce();
 }
 
+float3 nextPointByForce(float3 force, float3 nextPoint, float3 nowForce, float3 normalBoard)
+{
+	float3 force_diff = nowForce - force; //difference between what we want and what we have
+	if (length(nowForce) > 15)
+	{
+		perror("too much force");
+		exit(1);
+	}
+	float3 force_corr= dot(force_diff, normalBoard) * normalBoard; //force correction, how much to move in the direction of the normal.
+	return nextPoint + force_corr;
+}
+
 
 void mainLoopForDrawLine(vector<float3> line)
 {
@@ -248,7 +260,7 @@ void mainLoopForDrawLine(vector<float3> line)
 	//while (!finishDraw)
 	//{
 
-		
+	
 		
 
 		// pass params to jonathan func
