@@ -2,7 +2,7 @@
 
 float inner_prod(float3 v, float3 u)
 {
-	return v.x * u.x + v.y * u.y + v.z * u.z;
+	return (v.x * u.x) + (v.y * u.y) + (v.z * u.z);
 }
 
 float inverse_norm(float3 v)
