@@ -1,35 +1,65 @@
 ﻿  first_move.cpp
+<<<<<<< HEAD
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(245,93): warning C4305: 'argument': truncation from 'double' to 'const T'
+=======
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(242,91): warning C4305: 'argument': truncation from 'double' to 'float'
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(281,32): warning C4305: 'argument': truncation from 'double' to 'const T'
+>>>>>>> f5ccf870fc9cba2fcddeb4715441c9342f54eae8
           with
           [
               T=float
           ]
+<<<<<<< HEAD
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(256,96): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(266,41): warning C4305: 'argument': truncation from 'double' to 'const T'
+=======
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(281,43): warning C4305: 'argument': truncation from 'double' to 'const T'
+>>>>>>> f5ccf870fc9cba2fcddeb4715441c9342f54eae8
           with
           [
               T=float
           ]
+<<<<<<< HEAD
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(270,91): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(309,37): warning C4305: 'argument': truncation from 'double' to 'const T'
+=======
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(281,55): warning C4305: 'argument': truncation from 'double' to 'const T'
+>>>>>>> f5ccf870fc9cba2fcddeb4715441c9342f54eae8
           with
           [
               T=float
           ]
+<<<<<<< HEAD
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(309,48): warning C4305: 'argument': truncation from 'double' to 'const T'
+=======
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(281,96): warning C4305: 'argument': truncation from 'double' to 'const T'
+>>>>>>> f5ccf870fc9cba2fcddeb4715441c9342f54eae8
           with
           [
               T=float
           ]
+<<<<<<< HEAD
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(309,60): warning C4305: 'argument': truncation from 'double' to 'const T'
+=======
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(284,17): warning C4305: 'argument': truncation from 'double' to 'const T'
+>>>>>>> f5ccf870fc9cba2fcddeb4715441c9342f54eae8
           with
           [
               T=float
           ]
+<<<<<<< HEAD
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(311,32): warning C4305: 'argument': truncation from 'double' to 'const T'
+=======
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(284,28): warning C4305: 'argument': truncation from 'double' to 'const T'
+>>>>>>> f5ccf870fc9cba2fcddeb4715441c9342f54eae8
           with
           [
               T=float
           ]
+<<<<<<< HEAD
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(301,21): warning C4101: 'result': unreferenced local variable
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(301,6): warning C4101: 'programResult': unreferenced local variable
+=======
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(284,40): warning C4305: 'argument': truncation from 'double' to 'const T'
           with
           [
@@ -47,4 +77,5 @@ C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(284,81): warning C4305: 
           ]
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(273,21): warning C4101: 'result': unreferenced local variable
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(273,6): warning C4101: 'programResult': unreferenced local variable
+>>>>>>> f5ccf870fc9cba2fcddeb4715441c9342f54eae8
   EyalHarelJonathan.vcxproj -> C:\Users\Administrator\EyalHarelJonathan\EyalHarelJonathan\x64\Debug\EyalHarelJonathan.exe
