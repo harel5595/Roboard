@@ -25,6 +25,11 @@ C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(300,32): warning C4305: 
           [
               T=float
           ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(302,17): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(290,21): warning C4101: 'result': unreferenced local variable
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(290,6): warning C4101: 'programResult': unreferenced local variable
   EyalHarelJonathan.vcxproj -> C:\Users\Administrator\EyalHarelJonathan\EyalHarelJonathan\x64\Debug\EyalHarelJonathan.exe

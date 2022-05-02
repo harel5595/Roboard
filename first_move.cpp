@@ -297,7 +297,9 @@ int main(void)
 	Sleep(5000);
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 
-	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.0 }, float2{ 2.0,2.0 }, 3000); // call eyal func
+	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.5, 1.5 }, float2{ 1.0,0.0 }, 3000); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.0 }, float2{ 2.0,2.0 }, 3000); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
 	
 	//vector<float3> line = getLine(LEFT_DOWN, RIGHT_DOWN, LEFT_UP, float2{ 1, 0.0 }, float2{ 1,0.4 }); // call eyal func
