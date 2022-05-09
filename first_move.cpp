@@ -62,6 +62,12 @@ int(*MySetTorqueSafetyFactor)(float factor);
 int(*MySetTorqueVibrationController)(float value);
 int(*MySendAngularTorqueCommand)(float Command[COMMAND_SIZE]);
 int(*MySendCartesianForceCommand)(float Command[COMMAND_SIZE]);
+TrajectoryPoint* CartesianToPoint(float x, float y, float z);
+
+TrajectoryPoint* CartesianToPoint(float3 point)
+{
+	return CartesianToPoint(point.x, point.y, point.z);
+}
 
 
 /*
@@ -80,9 +86,10 @@ TrajectoryPoint * CartesianToPoint(float x, float y, float z)
 	pos.X = x;
 	pos.Y = y;
 	pos.Z = z;
-	//pos.ThetaX = -1.7;
-	//pos.ThetaY = 0.021;
-	//pos.ThetaZ = -2.58;
+	 
+	pos.ThetaX = -1.7;
+	pos.ThetaY = -0.1215;
+	pos.ThetaZ = -2.593;
 	//point.Fingers.Finger1 = 4896;
 	//point.Fingers.Finger2 = 4896;
 	//point.Fingers.Finger3 = 4962;
@@ -228,6 +235,18 @@ int initRobotAPI()
 
 void waitUntilGetToPoint(float3 wanted_pos)
 {
+	CartesianPosition cur_point;
+	float3 priv = float3{ 0,0,0 };
+	cout << "dst: " << wanted_pos << endl;
+	while (true)
+	{
+		cout << float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } << endl;
+		Sleep(2);
+		MyGetCartesianPosition(cur_point);
+		if(length(float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } - wanted_pos) < 0.008 || (float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } == priv && length(float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } - wanted_pos) < 0.01))
+			return;
+		priv = float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z };
+	}
 	//CartesianPosition pos = MyGetCartesianForce();
 }
 
@@ -240,17 +259,23 @@ float3 nextPointByForce(float3 force, float3 nextPoint, float3 nowForce, float3 
 		perror("too much force");
 		exit(1);
 	}
-	float3 force_corr = dot(force_diff, normalBoard) * normalBoard * float3 { 0.02, 0.02, 0.02 }; //force correction, how much to move in the direction of the normal.
+	float3 force_corr = dot(force_diff, normalBoard) * normalBoard * float3 { 0.00, 0.04, 0.00 }; //force correction, how much to move in the direction of the normal.
 	cout <<"curr force:     " << length(nowForce) << "      curr_correction:   " << force_corr << endl;
 	return nextPoint + force_corr;
 }
 
 void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 {
+	cout << normalBoard << "the normal" << endl;
 	bool finishDraw = false;
 	cout << line[0] << endl << line[1] << endl;
 	//return ;
-	float3 wanted_force = float3{-5,13,-1 };
+	TrajectoryPoint* pos = CartesianToPoint(line[0]);
+	MySendBasicTrajectory(*pos);
+	free(pos);
+	waitUntilGetToPoint(line[0]);
+
+	float3 wanted_force = float3{3,23,2 };
 	for (auto point : line)
 	{
 		CartesianPosition force;
@@ -259,7 +284,7 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 		TrajectoryPoint* pos = CartesianToPoint(point.x, point.y, point.z, -1.7, -0.1215, -2.593);
 		MySendBasicTrajectory(*pos);
 		free(pos);
-		Sleep(10);
+		waitUntilGetToPoint(point);
 	}
 																										  
 	//while (!finishDraw)
@@ -293,14 +318,14 @@ int main(void)
 		return 1;
 
 	MyMoveHome();
-	MyInitFingers();
-	Sleep(5000);
+	//MyInitFingers();
+	Sleep(2000);
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 
-	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.5, 1.5 }, float2{ 1.0,0.0 }, 3000); // call eyal func
+	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.5 }, float2{ 1.0,1.0 }, 100); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
-	line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.0 }, float2{ 2.0,2.0 }, 3000); // call eyal func
-	mainLoopForDrawLine(line, basis[2]);
+	//line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.0 }, float2{ 2.0,2.0 }, 3000); // call eyal func
+	//mainLoopForDrawLine(line, basis[2]);
 	
 	//vector<float3> line = getLine(LEFT_DOWN, RIGHT_DOWN, LEFT_UP, float2{ 1, 0.0 }, float2{ 1,0.4 }); // call eyal func
 	//mainLoopForDrawLine(line);
