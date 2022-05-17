@@ -1,6 +1,10 @@
 #include "lineMath.h"
 
 
+float3 glob_e1;
+float3 glob_e2;
+float3 glob_e3;
+
 vector<float3> getNewBasis(float3 baseBoard, float3 XBoard, float3 YBoard)
 {
 	float3 relX = XBoard - baseBoard;
@@ -13,9 +17,17 @@ vector<float3> getNewBasis(float3 baseBoard, float3 XBoard, float3 YBoard)
 	basis.push_back(e1);
 	basis.push_back(e2);
 	basis.push_back(e3);
+	glob_e1 = e1;
+	glob_e2 = e2;
+	glob_e3 = e3;
 	return basis;
 
+}
 
+
+float3 translate_to_board_coordinates(float3 v)
+{
+	return float3{ dot(glob_e1, v), dot(glob_e2, v), dot(glob_e3, v) };
 }
 
 

@@ -87,12 +87,12 @@ TrajectoryPoint * CartesianToPoint(float x, float y, float z)
 	pos.Y = y;
 	pos.Z = z;
 	 
-	pos.ThetaX = -1.7;
-	pos.ThetaY = -0.1215;
-	pos.ThetaZ = -2.593;
-	//point.Fingers.Finger1 = 4896;
-	//point.Fingers.Finger2 = 4896;
-	//point.Fingers.Finger3 = 4962;
+	pos.ThetaX = -1.57;
+	pos.ThetaY = -0.1145;
+	pos.ThetaZ = -2.9938;
+	point.Fingers.Finger1 = 6486;
+	point.Fingers.Finger2 = 6312;
+	point.Fingers.Finger3 = 6312;
 
 
 
@@ -121,15 +121,20 @@ TrajectoryPoint* CartesianToPoint(float x, float y, float z, float thetaX, float
 	pos.ThetaX = thetaX;
 	pos.ThetaY = thetaY;
 	pos.ThetaZ = thetaZ;
-	point.Fingers.Finger1 = 6896;
-	point.Fingers.Finger2 = 6896;
-	point.Fingers.Finger3 = 6862;
+	point.Fingers.Finger1 = 6486;
+	point.Fingers.Finger2 = 6312;
+	point.Fingers.Finger3 = 6312;
 
 
 
 	point.CartesianPosition = pos;
 	start->Position = point;
 	return start;
+}
+
+float3 PointToCartesian(CartesianPosition point)
+{
+	return float3{ point.Coordinates.X,point.Coordinates.Y,point.Coordinates.Z };
 }
 
 
@@ -237,15 +242,24 @@ void waitUntilGetToPoint(float3 wanted_pos)
 {
 	CartesianPosition cur_point;
 	float3 priv = float3{ 0,0,0 };
+	int counter = 0;
 	cout << "dst: " << wanted_pos << endl;
 	while (true)
 	{
-		cout << float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } << endl;
+		counter++;
+		//cout << float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } << endl;
 		Sleep(2);
 		MyGetCartesianPosition(cur_point);
 		if(length(float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } - wanted_pos) < 0.008 || (float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } == priv && length(float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } - wanted_pos) < 0.01))
 			return;
 		priv = float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z };
+		if (counter == 100) {
+			counter = 0;
+			cout << "dst: " << wanted_pos << ", pos: " << float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } << endl;
+			TrajectoryPoint* pos = CartesianToPoint(wanted_pos);
+			MySendBasicTrajectory(*pos);
+			free(pos);
+		}
 	}
 	//CartesianPosition pos = MyGetCartesianForce();
 }
@@ -266,39 +280,27 @@ float3 nextPointByForce(float3 force, float3 nextPoint, float3 nowForce, float3 
 
 void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 {
-	cout << normalBoard << "the normal" << endl;
+	cout << normalBoard << " - the normal" << endl;
 	bool finishDraw = false;
 	cout << line[0] << endl << line[1] << endl;
-	//return ;
 	TrajectoryPoint* pos = CartesianToPoint(line[0]);
 	MySendBasicTrajectory(*pos);
 	free(pos);
 	waitUntilGetToPoint(line[0]);
 
-	float3 wanted_force = float3{3,23,2 };
+	float3 wanted_force = float3{0.5,1.5,-0.7 };
 	for (auto point : line)
 	{
 		CartesianPosition force;
 		MyGetCartesianPosition(force);
+		cout << "my pos: " << translate_to_board_coordinates(PointToCartesian(force)) << endl;
 		point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
-		TrajectoryPoint* pos = CartesianToPoint(point.x, point.y, point.z, -1.7, -0.1215, -2.593);
+		TrajectoryPoint* pos = CartesianToPoint(point);
 		MySendBasicTrajectory(*pos);
 		free(pos);
-		waitUntilGetToPoint(point);
+		Sleep(10);
+		//waitUntilGetToPoint(point);
 	}
-																										  
-	//while (!finishDraw)
-	//{
-
-		
-		
-
-		// pass params to jonathan func
-
-		// use the result to move the robot 
-
-		// wait until the robot arives
-	//}
 }
 
 
@@ -306,6 +308,7 @@ void disconnectFromRobot()
 {
 	MyCloseAPI();
 }
+
 
 
 
@@ -318,12 +321,24 @@ int main(void)
 		return 1;
 
 	MyMoveHome();
+	//MySetTorqueSafetyFactor(15);
 	//MyInitFingers();
 	Sleep(2000);
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 
-	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.5 }, float2{ 1.0,1.0 }, 100); // call eyal func
+	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
+
+
+	line = getLine(LEFT_DOWN, basis, float2{ 1.2, 1.0 }, float2{ 1.0,1.0 }, 10); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.0, 1.0 }, float2{ 1.2,0.5 }, 10); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.0,0.5 }, 10); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+
+
+
 	//line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.0 }, float2{ 2.0,2.0 }, 3000); // call eyal func
 	//mainLoopForDrawLine(line, basis[2]);
 	
@@ -334,83 +349,5 @@ int main(void)
 	//mainLoopForDrawLine(line);
 
 	disconnectFromRobot();
-
-	/*
-	TrajectoryPoint start;
-	start.InitStruct();
-	
-	UserPosition point = UserPosition();
-	point.InitStruct();
-	point.Type = CARTESIAN_POSITION;
-	CartesianInfo pos;
-	pos.X = 0.54;
-	pos.Y = 0.2815;
-	pos.Z = 0.56;
-	pos.ThetaX = -1.7;
-	pos.ThetaY = 0.021;
-	pos.ThetaZ = -2.58;
-	point.Fingers.Finger1 = 4896;
-	point.Fingers.Finger2 = 4896;
-	point.Fingers.Finger3 = 4962;
-
-
-
-	point.CartesianPosition = pos;
-	start.Position = point;
-
-	TrajectoryPoint end;
-	end.InitStruct();
-
-	UserPosition end_pos = UserPosition();
-	end_pos.InitStruct();
-	end_pos.Type = CARTESIAN_POSITION;
-	CartesianInfo end_pos_info;
-	end_pos_info.X = 0.3879;
-	end_pos_info.Y = 0.2815;
-	end_pos_info.Z = 0.559;
-	end_pos_info.ThetaX = -1.7;
-	end_pos_info.ThetaY = -0.1215;
-	end_pos_info.ThetaZ = -2.593;
-	end_pos.Fingers.InitStruct();
-	end_pos.Fingers.Finger1 = 4896;
-	end_pos.Fingers.Finger2 = 4896;
-	end_pos.Fingers.Finger3 = 4962;
-
-
-	end_pos.CartesianPosition = end_pos_info;
-	end.Position = end_pos;
-
-	//MyInitFingers();
-
-
-	//We specify that this point will use Cartesian position
-	//pointToSend.Position.Type = CARTESIAN_POSITION;
-	//Sleep(10000);
-	TrajectoryPoint close_fingers;
-	close_fingers.InitStruct();
-
-	UserPosition close_fingers_pos = UserPosition();
-	close_fingers_pos.InitStruct();
-	close_fingers_pos.Type = CARTESIAN_POSITION;
-	CartesianInfo close_fingers_pos_info;
-	close_fingers_pos_info.X = 0.212;
-	close_fingers_pos_info.Y = -0.256;
-	close_fingers_pos_info.Z = 0.5;
-	close_fingers_pos_info.ThetaX = 1.65;
-	close_fingers_pos_info.ThetaY = 1.11;
-	close_fingers_pos_info.ThetaZ = 0.1217;
-	close_fingers_pos.Fingers.InitStruct();
-	close_fingers_pos.CartesianPosition = close_fingers_pos_info;
-	close_fingers_pos.Fingers.Finger1 = 4896;
-	close_fingers_pos.Fingers.Finger2 = 4896;
-	close_fingers_pos.Fingers.Finger3 = 4962;
-	
-		
-		
-	//MySendBasicTrajectory(close_fingers);
-	MySendBasicTrajectory(start);
-	Sleep(10000);
-	MySendBasicTrajectory(end);
-	*/
 
 }
