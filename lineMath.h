@@ -14,4 +14,5 @@ using std::vector;
 
 vector<float3> getNewBasis(float3 baseBoard, float3 XBoard, float3 YBoard);
 vector<float3> getLine(float3 baseBoard, vector<float3> basis, float2 pos1_2D, float2 pos2_2D, int numOfPoints);
-float3 translate_to_board_coordinates(float3 v);
+float3 translateToBoardCoordinates(float3 v);
+vector<float3> getCircArc(float3 baseBoard, vector<float3> basis, float2 center, float rad, float alpha0, float angle, int numOfPoints)
