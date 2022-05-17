@@ -35,18 +35,18 @@ float3 translateToRealCoordinates(float2 v)
 	return (glob_e1 * v.x) + (glob_e2 * v.y);
 }
 
-vector<float3> getLine(float3 baseBoard, vector<float3> basis, float2 pos1_2D, float2 pos2_2D, int numOfPoints)
+vector<float3> getLine(float3 baseBoard, vector<float3> basis, float2 pos1_2D, float2 pos2_2D, int numOfPoints, bool drawing)
 {
 	float3 e1 = basis[0];
 	float3 e2 = basis[1];
-	
+	float3 base = drawing ? baseBoard : baseBoard + 0.01 * glob_e3;
 	vector<float3> positions;
 	float3 pos1 = (pos1_2D.x * e1) + (pos1_2D.y * e2);
 	float3 pos2 = (pos2_2D.x * e1) + (pos2_2D.y * e2);
 	float3 delta = pos2 - pos1;
 	for (float t = 0; t <= 1; t += (1.0/numOfPoints))
 	{
-		positions.push_back(baseBoard + pos1 + (t * delta));
+		positions.push_back(base + pos1 + (t * delta));
 	}
 	return positions;
 	
@@ -64,4 +64,16 @@ vector<float3> getCircArc(float3 baseBoard, vector<float3> basis, float2 center,
 	}
 	return positions;
 
+}
+
+
+vector<float3> getCurve(float3 baseBoard, float2(*gamma)(float), int numOfPoints, bool drawing)
+{
+	float3 base = drawing ? baseBoard : baseBoard + 0.01 * glob_e3;
+	vector<float3> positions;
+	for (float t = 0; t <= 1; t += (1.0 / numOfPoints))
+	{
+		positions.push_back(base + translateToRealCoordinates(gamma(t)));
+	}
+	return positions;
 }
