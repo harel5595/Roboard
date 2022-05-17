@@ -293,7 +293,7 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 	{
 		CartesianPosition force;
 		MyGetCartesianPosition(force);
-		cout << "my pos: " << translate_to_board_coordinates(PointToCartesian(force)) << endl;
+		cout << "my pos: " << translateToBoardCoordinates(PointToCartesian(force)) << endl;
 		point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
 		TrajectoryPoint* pos = CartesianToPoint(point);
 		MySendBasicTrajectory(*pos);

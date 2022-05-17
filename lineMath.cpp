@@ -25,11 +25,15 @@ vector<float3> getNewBasis(float3 baseBoard, float3 XBoard, float3 YBoard)
 }
 
 
-float3 translate_to_board_coordinates(float3 v)
+float3 translateToBoardCoordinates(float3 v)
 {
 	return float3{ dot(glob_e1, v), dot(glob_e2, v), dot(glob_e3, v) };
 }
 
+float3 translateToRealCoordinates(float2 v)
+{
+	return glob_e1 * v.x + glob_e2 * v.y;
+}
 
 vector<float3> getLine(float3 baseBoard, vector<float3> basis, float2 pos1_2D, float2 pos2_2D, int numOfPoints)
 {
@@ -46,4 +50,21 @@ vector<float3> getLine(float3 baseBoard, vector<float3> basis, float2 pos1_2D, f
 	}
 	return positions;
 	
+}
+
+vector<float3> getCircArc(float3 baseBoard, vector<float3> basis, float2 center, float rad, float alpha0, float angle, int numOfPoints)
+{
+	float3 e1 = basis[0];
+	float3 e2 = basis[1];
+
+	vector<float3> positions;
+	
+	for (float t = 0; t <= 1; t += (1.0 / numOfPoints))
+	{
+		float2 circ_offset = rad * float2{ cos(alpha0 + (t * angle)), sin(alpha0 + (t * angle)) };
+		float2 board_point = center + circ_offset;
+		positions.push_back(translateToRealCoordinates(board_point));
+	}
+	return positions;
+
 }
