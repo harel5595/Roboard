@@ -143,10 +143,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\alphabet.cpp" />
     <ClCompile Include="..\..\first_move.cpp" />
     <ClCompile Include="..\..\lineMath.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\alphabet.h" />
     <ClInclude Include="..\..\CommandLayer.h" />
     <ClInclude Include="..\..\CommunicationLayer.h" />
     <ClInclude Include="..\..\linalg.h" />

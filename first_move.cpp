@@ -20,6 +20,7 @@
 #include <conio.h>
 #include <iomanip>
 #include "lineMath.h"
+#include "alphabet.h"
 #endif
 
 #define MAX_FORCE 17
@@ -312,7 +313,31 @@ void disconnectFromRobot()
 }
 
 
+void drawRoad(vector<float2> road, vector<float3> basis)
+{
+	float2 priv = float2{ 0,0 };
+	for (auto curr : road)
+	{
+		if (priv == float2{ 0,0 })
+		{
+			priv = curr;
+			continue;
+		}
 
+		vector<float3> line = getLine(LEFT_DOWN, basis, priv, curr, 10);
+		mainLoopForDrawLine(line, basis[2]);
+	}
+}
+
+
+void drawHI()
+{
+	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
+	vector<float2> road = drawCapH(float2{ 0.8, 0.2 });
+	drawRoad(road, basis);
+	road = drawCapI(float2{ 1.2, 0.2 });
+	drawRoad(road, basis);
+}
 
 
 int main(void)
@@ -326,13 +351,15 @@ int main(void)
 	//MySetTorqueSafetyFactor(15);
 	//MyInitFingers();
 	Sleep(2000);
-	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
+	//drawHI();
 
-	vector<float3> line = getCircArc(LEFT_DOWN, basis, float2{ 1, 0.2 }, 0.1, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
+	///return 0;
+	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
+	vector<float3> line =  getCircArc(LEFT_DOWN, basis, float2{ 1, 0.2 }, 0.1, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
-	 line = getCircArc(LEFT_DOWN, basis, float2{ 1, 0.2 }, 0.066, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
+	 line = getCircArc(LEFT_DOWN, basis, float2{ 1.033, 0.2 }, 0.066, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
-	 line = getCircArc(LEFT_DOWN, basis, float2{ 1, 0.2 }, 0.03, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
+	 line = getCircArc(LEFT_DOWN, basis, float2{ 1.066, 0.2 }, 0.03, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
 
 	//line = getLine(LEFT_DOWN, basis, float2{ 1.2, 1.0 }, float2{ 1.0,1.0 }, 10); // call eyal func
