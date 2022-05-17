@@ -286,15 +286,17 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 	TrajectoryPoint* pos = CartesianToPoint(line[0]);
 	MySendBasicTrajectory(*pos);
 	free(pos);
-	waitUntilGetToPoint(line[0]);
+	//waitUntilGetToPoint(line[0]);
 
 	float3 wanted_force = float3{0.5,1.5,-0.7 };
 	for (auto point : line)
 	{
+		cout << "3d: " << point << endl;
+
 		CartesianPosition force;
 		MyGetCartesianPosition(force);
-		cout << "my pos: " << translateToBoardCoordinates(PointToCartesian(force)) << endl;
-		point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
+		cout << "my pos: " << translateToBoardCoordinates(PointToCartesian(force)) << ", " << PointToCartesian(force) << endl;
+		//point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
 		TrajectoryPoint* pos = CartesianToPoint(point);
 		MySendBasicTrajectory(*pos);
 		free(pos);
@@ -326,16 +328,19 @@ int main(void)
 	Sleep(2000);
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 
-	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
+	vector<float3> line = getCircArc(LEFT_DOWN, basis, float2{ 1, 0.2 }, 0.1, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	 line = getCircArc(LEFT_DOWN, basis, float2{ 1, 0.2 }, 0.066, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	 line = getCircArc(LEFT_DOWN, basis, float2{ 1, 0.2 }, 0.03, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
 
-
-	line = getLine(LEFT_DOWN, basis, float2{ 1.2, 1.0 }, float2{ 1.0,1.0 }, 10); // call eyal func
-	mainLoopForDrawLine(line, basis[2]);
-	line = getLine(LEFT_DOWN, basis, float2{ 1.0, 1.0 }, float2{ 1.2,0.5 }, 10); // call eyal func
-	mainLoopForDrawLine(line, basis[2]);
-	line = getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.0,0.5 }, 10); // call eyal func
-	mainLoopForDrawLine(line, basis[2]);
+	//line = getLine(LEFT_DOWN, basis, float2{ 1.2, 1.0 }, float2{ 1.0,1.0 }, 10); // call eyal func
+	//mainLoopForDrawLine(line, basis[2]);
+	//line = getLine(LEFT_DOWN, basis, float2{ 1.0, 1.0 }, float2{ 1.2,0.5 }, 10); // call eyal func
+	//mainLoopForDrawLine(line, basis[2]);
+	//line = getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.0,0.5 }, 10); // call eyal func
+	//mainLoopForDrawLine(line, basis[2]);
 
 
 
