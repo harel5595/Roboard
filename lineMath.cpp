@@ -65,11 +65,11 @@ vector<float3> getCircArc(float3 baseBoard, vector<float3> basis, float2 center,
 	return positions;
 
 }
-
+\
 
 vector<float3> getCurve(float3 baseBoard, float2(*gamma)(float), int numOfPoints, bool drawing)
 {
-	float3 base = drawing ? baseBoard : baseBoard + 0.01 * glob_e3;
+	float3 base = drawing ? baseBoard : (float3)(baseBoard + (0.01 * glob_e3));
 	vector<float3> positions;
 	for (float t = 0; t <= 1; t += (1.0 / numOfPoints))
 	{
