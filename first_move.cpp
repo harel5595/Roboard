@@ -324,7 +324,7 @@ void drawRoad(vector<float2> road, vector<float3> basis)
 			continue;
 		}
 
-		vector<float3> line = getLine(LEFT_DOWN, basis, priv, curr, 10);
+		vector<float3> line = getLine(LEFT_DOWN, basis, priv, curr, 10, true);
 		mainLoopForDrawLine(line, basis[2]);
 	}
 }
@@ -351,16 +351,21 @@ int main(void)
 	//MySetTorqueSafetyFactor(15);
 	//MyInitFingers();
 	Sleep(2000);
-	//drawHI();
+	drawHI();
 
 	///return 0;
-	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
-	vector<float3> line =  getCircArc(LEFT_DOWN, basis, float2{ 1, 0.2 }, 0.1, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
+	/*vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
+	cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
+	
+	vector<float3> line =  getCircArc(LEFT_DOWN, basis, float2{ 1, 0.2 }, 0.1, 0, 6.28, 100);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
-	 line = getCircArc(LEFT_DOWN, basis, float2{ 1.033, 0.2 }, 0.066, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
+	line = getLine(LEFT_DOWN, basis, float2{ 1.1,0.2 }, float2{ 1,0.3 }, 5, false);
 	mainLoopForDrawLine(line, basis[2]);
-	 line = getCircArc(LEFT_DOWN, basis, float2{ 1.066, 0.2 }, 0.03, 0, 6.28, 50);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
+	line = getCircArc(LEFT_DOWN, basis, float2{ 0.9, 0.3 }, 0.1, 0, 6.28, 100);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
+	*/
+	//line = getCircArc(LEFT_DOWN, basis, float2{ 1.066, 0.2 }, 0.03, 0, 6.28, 6);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
+	//mainLoopForDrawLine(line, basis[2]);
 
 	//line = getLine(LEFT_DOWN, basis, float2{ 1.2, 1.0 }, float2{ 1.0,1.0 }, 10); // call eyal func
 	//mainLoopForDrawLine(line, basis[2]);
