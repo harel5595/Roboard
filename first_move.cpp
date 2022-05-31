@@ -352,12 +352,12 @@ void drawFile(string fileName)
 	// Use a while loop together with the getline() function to read the file line by line
 	while (getline(MyReadFile, line)) {
 		// Output the text from the file
-		
+		line_splited = vector<string>();
 		size_t pos = 0;
 		std::string token;
 		while ((pos = line.find(delimiter)) != std::string::npos) {
 			token = line.substr(0, pos);
-			std::cout << token << std::endl;
+			//std::cout << token << std::endl;
 			line_splited.push_back(token);
 			line.erase(0, pos + delimiter.length());
 		}
@@ -369,6 +369,7 @@ void drawFile(string fileName)
 			float2 second_point = float2{ std::stof(line_splited[3]), std::stof(line_splited[4]) };
 			bool drawing = line_splited[5] == "T";
 			mainLoopForDrawLine(getLine(LEFT_DOWN, basis, first_point, second_point, 20, drawing), basis[2]);
+			cout << "first point:" << first_point << " , second:" << second_point << endl;
 		}
 		else if (line_splited[0] == "C")
 		{
@@ -399,7 +400,7 @@ int main(void)
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 	cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
 	
-	drawFile(string("Hello.txt"));
+	drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\trial.corr"));
 	
 	/*
 	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.3 }, float2{ 1.0,0.30 }, 10, false);
