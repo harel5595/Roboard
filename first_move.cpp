@@ -1,5 +1,5 @@
 #include "linalg.h"
-
+#include <fstream>
 #include <iostream>
 #include "KinovaTypes.h"
 //#include <stdlib.h>
@@ -340,6 +340,48 @@ void drawHI()
 }
 
 
+// L:cord_x,cord_y:cord_x,cord_y:T/F
+
+void drawFile(string fileName)
+{
+	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
+	ifstream MyReadFile(fileName);
+	string line;
+	string delimiter = ":";
+	vector<string> line_splited;
+	// Use a while loop together with the getline() function to read the file line by line
+	while (getline(MyReadFile, line)) {
+		// Output the text from the file
+		
+		size_t pos = 0;
+		std::string token;
+		while ((pos = line.find(delimiter)) != std::string::npos) {
+			token = line.substr(0, pos);
+			std::cout << token << std::endl;
+			line_splited.push_back(token);
+			line.erase(0, pos + delimiter.length());
+		}
+		
+		
+		if (line_splited[0] ==  "L") // need to draw a line
+		{
+			float2 first_point = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
+			float2 second_point = float2{ std::stof(line_splited[3]), std::stof(line_splited[4]) };
+			bool drawing = line_splited[5] == "T";
+			mainLoopForDrawLine(getLine(LEFT_DOWN, basis, first_point, second_point, 20, drawing), basis[2]);
+		}
+		else if (line_splited[0] == "C")
+		{
+			float2 center = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
+			float radios = std::stof(line_splited[3]);
+			float start_angle = std::stof(line_splited[4]);
+			float draw_angle = std::stof(line_splited[5]);
+			mainLoopForDrawLine(getCircArc(LEFT_DOWN, basis, center, radios, start_angle, draw_angle, 100), basis[2]);
+		}
+	}
+}
+
+
 int main(void)
 {
 	int programResult, result;
@@ -351,12 +393,30 @@ int main(void)
 	//MySetTorqueSafetyFactor(15);
 	//MyInitFingers();
 	Sleep(2000);
-	drawHI();
+	//drawHI();
 
 	///return 0;
-	/*vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
+	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 	cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
 	
+	drawFile(string("Hello.txt"));
+	
+	/*
+	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.3 }, float2{ 1.0,0.30 }, 10, false);
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.3 }, float2{ 1.0,0.2 }, 10, true); // |
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.3 }, float2{ 1.0,0.25 }, 10, false); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.25 }, float2{ 1.05,0.25 }, 30, true); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.05, 0.25 }, float2{ 1.05,0.3 }, 10, false); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.05, 0.3 }, float2{ 1.05,0.2 }, 10, true); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	*/
+	
+	/*
 	vector<float3> line =  getCircArc(LEFT_DOWN, basis, float2{ 1, 0.2 }, 0.1, 0, 6.28, 100);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
 	mainLoopForDrawLine(line, basis[2]);
 	line = getLine(LEFT_DOWN, basis, float2{ 1.1,0.2 }, float2{ 1,0.3 }, 5, false);
@@ -366,15 +426,16 @@ int main(void)
 	*/
 	//line = getCircArc(LEFT_DOWN, basis, float2{ 1.066, 0.2 }, 0.03, 0, 6.28, 6);//getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.2,1.0 }, 10); // call eyal func
 	//mainLoopForDrawLine(line, basis[2]);
-
-	//line = getLine(LEFT_DOWN, basis, float2{ 1.2, 1.0 }, float2{ 1.0,1.0 }, 10); // call eyal func
-	//mainLoopForDrawLine(line, basis[2]);
-	//line = getLine(LEFT_DOWN, basis, float2{ 1.0, 1.0 }, float2{ 1.2,0.5 }, 10); // call eyal func
-	//mainLoopForDrawLine(line, basis[2]);
-	//line = getLine(LEFT_DOWN, basis, float2{ 1.2, 0.5 }, float2{ 1.0,0.5 }, 10); // call eyal func
-	//mainLoopForDrawLine(line, basis[2]);
-
-
+	/*
+	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.1, 0.3 }, float2{ 1.0,0.3 }, 10, true); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.3 }, float2{ 1.0,0.2 }, 10, true); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.2 }, float2{ 1.1,0.2 }, 10, true); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	line = getLine(LEFT_DOWN, basis, float2{ 1.1, 0.2 }, float2{ 1.1,0.3 }, 10, true); // call eyal func
+	mainLoopForDrawLine(line, basis[2]);
+	*/
 
 	//line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.0 }, float2{ 2.0,2.0 }, 3000); // call eyal func
 	//mainLoopForDrawLine(line, basis[2]);
