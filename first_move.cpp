@@ -398,6 +398,9 @@ int main(void)
 	///return 0;
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 	cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
+	
+	drawFile(string("Hello.txt"));
+	
 	/*
 	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.3 }, float2{ 1.0,0.30 }, 10, false);
 	mainLoopForDrawLine(line, basis[2]);
