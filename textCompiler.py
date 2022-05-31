@@ -70,4 +70,4 @@ def compileWord(string, height, X, Y, path):
             myFile.write(f"L:{X}:{Y}:{X+0.1*height}:{Y}:F:\n")
             X += 0.1*height
 if __name__ == '__main__':
-    compileWord("HA", 0.1,1.0,0.1,"trial.corr")
+    compileWord("HELLO WORLD!", 0.1,1.0,0.1,"Hello.txt")
