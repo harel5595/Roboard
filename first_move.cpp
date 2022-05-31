@@ -400,7 +400,7 @@ int main(void)
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 	cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
 	
-	drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\trial.corr"));
+	drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\Hello.txt"));
 	
 	/*
 	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.3 }, float2{ 1.0,0.30 }, 10, false);
