@@ -42,6 +42,101 @@ C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(338,35): warning C4305: 
           [
               T=float
           ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(357,37): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(357,48): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(357,60): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(360,32): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(360,67): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(360,87): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(362,17): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(362,52): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(362,71): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(364,17): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(364,52): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(366,17): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(366,74): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(368,17): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(368,54): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(368,74): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(370,17): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(370,53): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(370,73): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(345,21): warning C4101: 'result': unreferenced local variable
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(345,6): warning C4101: 'programResult': unreferenced local variable
   EyalHarelJonathan.vcxproj -> C:\Users\Administrator\EyalHarelJonathan\EyalHarelJonathan\x64\Debug\EyalHarelJonathan.exe
