@@ -406,7 +406,7 @@ int main(void)
 	//MySendBasicTrajectory(*start);
 	//free(start);
 
-	drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\Hello.txt"));
+	drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\Hello2.txt"));
 	
 	/*
 	vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 1.0, 0.3 }, float2{ 1.0,0.30 }, 10, false);
