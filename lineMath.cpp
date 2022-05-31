@@ -40,7 +40,7 @@ vector<float3> getLine(float3 baseBoard, vector<float3> basis, float2 pos1_2D, f
 	float3 e2 = basis[1];
 	float3 base = baseBoard;
 	if (!drawing)
-		base += (float3)(0.05 * glob_e3);
+		base += (float3)(0.03 * glob_e3);
 
 	vector<float3> positions;
 	float3 pos1 = (pos1_2D.x * e1) + (pos1_2D.y * e2);

@@ -292,7 +292,7 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 	float3 wanted_force = float3{0.5,1.5,-0.7 };
 	for (auto point : line)
 	{
-		cout << "3d: " << point << endl;
+		//cout << "3d: " << point << endl;
 
 		CartesianPosition force;
 		MyGetCartesianPosition(force);
@@ -366,7 +366,7 @@ void drawFile(string fileName)
 		if (line_splited[0] ==  "L") // need to draw a line
 		{
 			float2 first_point = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
-			float2 second_point = float2{ std::stof(line_splited[3]), std::stof(line_splited[4]) };
+			float2 second_point = float2{std::stof(line_splited[3]), std::stof(line_splited[4])};
 			bool drawing = line_splited[5] == "T";
 			mainLoopForDrawLine(getLine(LEFT_DOWN, basis, first_point, second_point, 20, drawing), basis[2]);
 			cout << "first point:" << first_point << " , second:" << second_point << endl;
@@ -399,7 +399,13 @@ int main(void)
 	///return 0;
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 	cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
-	
+	TrajectoryPoint* start = CartesianToPoint(0.4514, 0.2646, 0.5031);
+	MySendBasicTrajectory(*start);
+	//free(start);
+	//start = CartesianToPoint(-0.4911, 0.1204, 0.5203,-1.7394,-0.0947,-3.1058);
+	//MySendBasicTrajectory(*start);
+	//free(start);
+
 	drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\Hello.txt"));
 	
 	/*
