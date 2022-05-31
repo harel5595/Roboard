@@ -93,5 +93,5 @@ def compileWord(string, height, X, Y, path):
 
 
 if __name__ == '__main__':
-    compileWord("HELLO ", 0.1, 0.95, 0.25, "Hello2.txt")
-    compileWord("WORLD!", 0.1, 0.95, 0.1, "World2.txt")
+    compileWord("HELLO ", 0.1, 0.80, 0.25, "Hello2.txt")
+    compileWord("WORLD!", 0.1, 0.85, 0.1, "World2.txt")
