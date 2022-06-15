@@ -452,6 +452,17 @@ int main(void)
 
 	//line = getLine(LEFT_DOWN, RIGHT_DOWN, LEFT_UP, float2{ 1, 0.4 }, float2{ 0,0.4 }); // call eyal func
 	//mainLoopForDrawLine(line);
+	int i = 0;
+
+	while (i < 150)
+	{
+		CartesianPosition force;
+		MyGetCartesianForce(force);
+		cout << PointToCartesian(force) << endl;
+		Sleep(200);
+		i++;
+	}
+
 
 	disconnectFromRobot();
 

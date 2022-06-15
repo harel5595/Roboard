@@ -7,9 +7,9 @@
 using namespace linalg::aliases;
 using std::vector;
 
-#define LEFT_DOWN float3{-0.6427, 0.3213, 0.4123} 
-#define LEFT_UP float3{-0.3728, 0.3333, 0.8287}
-#define RIGHT_DOWN float3{0.5960,0.3633,0.4011}
+#define LEFT_DOWN float3{-0.6204, 0.4020, 0.4737} 
+#define LEFT_UP float3{-0.4703, 0.4010, 0.7115}
+#define RIGHT_DOWN float3{0.5724,0.4168,0.4759}
 
 
 vector<float3> getNewBasis(float3 baseBoard, float3 XBoard, float3 YBoard);
