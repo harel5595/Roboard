@@ -80,7 +80,7 @@ lines['W'] = [('L', (0, 0), (0, 1), False),
 
 lines['!'] = [('L', (0, 0), (0.25, 1), False),
               ('L', (0.25, 1), (0.25, 0.3), True),
-              ('L', (0.25, 0.3), (0.3, 0.15), False),
+              ('L', (0.25, 0.3), (0.3, 0.15), False),   
               ('C', (0.25, 0.15), 0.05, 0, 2 * pi),
               ('L', (0.3, 0.15), (0.5, 0), False)]
 
@@ -102,5 +102,5 @@ def compileWord(string, height, X, Y, path):
 
 
 if __name__ == '__main__':
-    compileWord("HELLO ", 0.1, 0.80, 0.25, "Hello2.txt")
-    compileWord("WORLD!", 0.1, 0.85, 0.1, "World2.txt")
+    compileWord("HELLO ", 0.08, 0.80, 0.15, "Hello2.txt")
+    compileWord("WORLD!", 0.08, 0.85, 0.05, "World2.txt")

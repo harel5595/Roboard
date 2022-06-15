@@ -281,9 +281,9 @@ float3 nextPointByForce(float3 force, float3 nextPoint, float3 nowForce, float3 
 
 void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 {
-	cout << normalBoard << " - the normal" << endl;
+	//cout << normalBoard << " - the normal" << endl;
 	bool finishDraw = false;
-	cout << line[0] << endl << line[1] << endl;
+	//cout << line[0] << endl << line[1] << endl;
 	TrajectoryPoint* pos = CartesianToPoint(line[0]);
 	MySendBasicTrajectory(*pos);
 	free(pos);
@@ -296,12 +296,12 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 
 		CartesianPosition force;
 		MyGetCartesianPosition(force);
-		cout << "my pos: " << translateToBoardCoordinates(PointToCartesian(force)) << ", " << PointToCartesian(force) << endl;
+		//cout << "my pos: " << translateToBoardCoordinates(PointToCartesian(force)) << ", " << PointToCartesian(force) << endl;
 		//point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
 		TrajectoryPoint* pos = CartesianToPoint(point);
 		MySendBasicTrajectory(*pos);
 		free(pos);
-		Sleep(10);
+		Sleep(1);
 		//waitUntilGetToPoint(point);
 	}
 }
@@ -368,8 +368,8 @@ void drawFile(string fileName)
 			float2 first_point = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
 			float2 second_point = float2{std::stof(line_splited[3]), std::stof(line_splited[4])};
 			bool drawing = line_splited[5] == "T";
-			mainLoopForDrawLine(getLine(LEFT_DOWN, basis, first_point, second_point, 20, drawing), basis[2]);
-			cout << "first point:" << first_point << " , second:" << second_point << endl;
+			mainLoopForDrawLine(getLine(LEFT_DOWN, basis, first_point, second_point, 1, drawing), basis[2]);
+			//cout << "first point:" << first_point << " , second:" << second_point << endl;
 		}
 		else if (line_splited[0] == "C")
 		{
@@ -377,7 +377,7 @@ void drawFile(string fileName)
 			float radios = std::stof(line_splited[3]);
 			float start_angle = std::stof(line_splited[4]);
 			float draw_angle = std::stof(line_splited[5]);
-			mainLoopForDrawLine(getCircArc(LEFT_DOWN, basis, center, radios, start_angle, draw_angle, 100), basis[2]);
+			mainLoopForDrawLine(getCircArc(LEFT_DOWN, basis, center, radios, start_angle, draw_angle, 10), basis[2]);
 		}
 	}
 }
@@ -398,7 +398,7 @@ int main(void)
 
 	///return 0;
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
-	cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
+	//cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
 	TrajectoryPoint* start = CartesianToPoint(0.4514, 0.2646, 0.5031);
 	MySendBasicTrajectory(*start);
 	//free(start);
