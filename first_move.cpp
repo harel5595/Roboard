@@ -265,18 +265,38 @@ void waitUntilGetToPoint(float3 wanted_pos)
 	//CartesianPosition pos = MyGetCartesianForce();
 }
 
-float3 nextPointByForce(float3 force, float3 nextPoint, float3 nowForce, float3 normalBoard)
-{
-	
-	float3 force_diff = force - nowForce; //difference between what we want and what we have
-	if (length(nowForce) > MAX_FORCE)
-	{
-		perror("too much force");
-		exit(1);
+float3 nextPointByForce(float3 nextPoint, float3 normalBoard)
+{	
+	int MEASURE = 5;
+
+	CartesianPosition forceSum;
+	CartesianPosition force;
+	for (int i = 0; i < MEASURE; i++) {
+		forceSum += MyGetCartesianForce(force);
+		sleep(1);
 	}
-	float3 force_corr = dot(force_diff, normalBoard) * normalBoard * float3 { 0.00, 0.04, 0.00 }; //force correction, how much to move in the direction of the normal.
-	cout <<"curr force:     " << length(nowForce) << "      curr_correction:   " << force_corr << endl;
-	return nextPoint + force_corr;
+	forceSum /= MEASURE;
+	
+	if (forceSum.Coordinates.Y > 10)
+	{
+		nextPoint.y -= 0.01;
+	}
+	else if (forceSum.Coordinates.Y < 5)
+	{
+		nextPoint.y += 0.01;
+	}
+
+	return nextPoint;
+	
+	//float3 force_diff = force - nowForce; //difference between what we want and what we have
+	//if (length(nowForce) > MAX_FORCE)
+	//{
+	//	perror("too much force");
+	//	exit(1);
+	//}
+	//float3 force_corr = dot(force_diff, normalBoard) * normalBoard * float3 { 0.00, 0.04, 0.00 }; //force correction, how much to move in the direction of the normal.
+	//cout <<"curr force:     " << length(nowForce) << "      curr_correction:   " << force_corr << endl;
+	//return nextPoint + force_corr;
 }
 
 void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
@@ -295,9 +315,10 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 		//cout << "3d: " << point << endl;
 
 		CartesianPosition force;
-		MyGetCartesianPosition(force);
-		cout << "my pos: " << translateToBoardCoordinates(PointToCartesian(force)) << ", " << PointToCartesian(force) << endl;
+		MyGetCartesianForce(force);
+		//cout << "my pos: " << translateToBoardCoordinates(PointToCartesian(force)) << ", " << PointToCartesian(force) << endl;
 		//point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
+		
 		TrajectoryPoint* pos = CartesianToPoint(point);
 		MySendBasicTrajectory(*pos);
 		free(pos);
