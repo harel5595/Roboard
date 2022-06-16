@@ -58,7 +58,7 @@ vector<float3> getCircArc(float3 baseBoard, vector<float3> basis, float2 center,
 {
 	vector<float3> positions;
 	
-	for (float t = 0; t <= 1; t += (1.0 / numOfPoints))
+	for (float t = 0; t <= 1.01; t += (1.0 / numOfPoints))
 	{
 		float2 circ_offset = rad * float2{ cos(alpha0 + (t * angle)), sin(alpha0 + (t * angle)) };
 		float2 board_point = center + circ_offset;
