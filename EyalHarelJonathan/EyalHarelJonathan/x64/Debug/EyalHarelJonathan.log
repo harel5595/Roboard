@@ -1,12 +1,4 @@
-﻿  alphabet.cpp
-C:\Users\Administrator\EyalHarelJonathan\alphabet.cpp(37,36): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\Administrator\EyalHarelJonathan\alphabet.cpp(38,36): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\Administrator\EyalHarelJonathan\alphabet.cpp(39,38): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\Administrator\EyalHarelJonathan\alphabet.cpp(41,38): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\Administrator\EyalHarelJonathan\alphabet.cpp(53,39): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\Administrator\EyalHarelJonathan\alphabet.cpp(54,36): warning C4305: 'argument': truncation from 'double' to 'float'
-C:\Users\Administrator\EyalHarelJonathan\alphabet.cpp(55,38): warning C4305: 'argument': truncation from 'double' to 'float'
-  first_move.cpp
+﻿  first_move.cpp
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(92,20): warning C4305: '=': truncation from 'double' to 'float'
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(93,22): warning C4305: '=': truncation from 'double' to 'float'
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(94,22): warning C4305: '=': truncation from 'double' to 'float'
@@ -100,9 +92,4 @@ C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(578,60): warning C4305: 
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(580,66): warning C4305: 'argument': truncation from 'double' to 'float'
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(566,21): warning C4101: 'result': unreferenced local variable
 C:\Users\Administrator\EyalHarelJonathan\first_move.cpp(566,6): warning C4101: 'programResult': unreferenced local variable
-  lineMath.cpp
-C:\Users\Administrator\EyalHarelJonathan\lineMath.cpp(49,53): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Administrator\EyalHarelJonathan\lineMath.cpp(61,55): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Administrator\EyalHarelJonathan\lineMath.cpp(76,52): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-  Generating Code...
   EyalHarelJonathan.vcxproj -> C:\Users\Administrator\EyalHarelJonathan\EyalHarelJonathan\x64\Debug\EyalHarelJonathan.exe
