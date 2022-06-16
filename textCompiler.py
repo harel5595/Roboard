@@ -165,20 +165,20 @@ lines['!'] = [('L', (0, 0), (0.25, 1), False),
 
 def compileWord(string, height, X, Y, path):
     with open(path, "w") as myFile:
-        myFile.write(f"L:{X}:{Y}:{X}:{Y}:F:\n")
+        myFile.write(f"L:{X}:{Y}:{X}:{Y}:F:\n")  # brings robot to start
         for c in string:
             for line in lines[c]:
-                if line[0] == "L":
+                if line[0] == "L":  # draws line
                     myFile.write(
-                        f"L:{X + line[1][0] * height}:{Y + line[1][1] * height}:{X + line[2][0] * height}:{Y + line[2][1] * height}:{'T' if line[3] else 'F'}:\n")
-                elif line[0] == "C":
+                        f"L:{round(X + line[1][0] * height,4)}:{round(Y + line[1][1] * height,4)}:{round(X + line[2][0] * height,4)}:{round(Y + line[2][1] * height,4)}:{'T' if line[3] else 'F'}:\n")
+                elif line[0] == "C":  # draws circle
                     myFile.write(
-                        f"C:{X + line[1][0] * height}:{Y + line[1][1] * height}:{line[2] * height}:{line[3]}:{line[4]}:\n")
-            X += 0.5 * height
-            myFile.write(f"L:{X}:{Y}:{X + 0.1 * height}:{Y}:F:\n")
+                        f"C:{round(X + line[1][0] * height,4)}:{round(Y + line[1][1] * height,4)}:{round(line[2] * height,4)}:{line[3]}:{line[4]}:\n")
+            X += 0.5 * height  # adds kerning
+            myFile.write(f"L:{round(X,4)}:{round(Y,4)}:{round(X + 0.1 * height,4)}:{round(Y,4)}:F:\n")
             X += 0.1 * height
 
 
 if __name__ == '__main__':
-    compileWord("HELLO ", 0.08, 0.80, 0.15, "Hello2.txt")
-    compileWord("WORLD!", 0.08, 0.85, 0.05, "World2.txt")
+    compileWord("QUESTION", 0.08, 0.80, 0.15, "Hello2.txt")
+    compileWord("MARK!", 0.08, 0.85, 0.05, "World2.txt")
