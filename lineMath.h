@@ -11,6 +11,8 @@ using std::vector;
 #define LEFT_UP float3{-0.4504, 0.3692, 0.7236}
 #define RIGHT_DOWN float3{0.5564,0.4046,0.3792}
 
+float3 getNormal();
+
 
 vector<float3> getNewBasis(float3 baseBoard, float3 XBoard, float3 YBoard);
 vector<float3> getLine(float3 baseBoard, vector<float3> basis, float2 pos1_2D, float2 pos2_2D, int numOfPoints, bool drawing);

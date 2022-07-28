@@ -23,6 +23,11 @@ vector<float3> getNewBasis(float3 baseBoard, float3 XBoard, float3 YBoard)
 
 }
 
+float3 getNormal()
+{
+	return glob_e3;
+}
+
 
 float3 translateToBoardCoordinates(float3 v)
 {

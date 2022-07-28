@@ -54,6 +54,7 @@ int(*MyGetAngularCommand)(AngularPosition&);
 int(*MyGetCartesianPosition)(CartesianPosition&);
 int(*MyGetAngularPosition)(AngularPosition&);
 int(*MyStopForceControl)();
+int(*MyEraseAllTrajectories)();
 
 // additional functions for force control
 int(*MyGetCartesianForce)(CartesianPosition&);
@@ -192,6 +193,7 @@ int initRobotAPI()
 	MyGetCartesianPosition = (int(*)(CartesianPosition&)) GetProcAddress(commandLayer_handle, "GetCartesianPosition");
 	MyGetAngularPosition = (int(*)(AngularPosition&)) GetProcAddress(commandLayer_handle, "GetAngularPosition");
 	MyStopForceControl = (int(*)()) GetProcAddress(commandLayer_handle, "StopForceControl");
+	MyEraseAllTrajectories = (int(*)()) GetProcAddress(commandLayer_handle, "EraseAllTrajectories");
 	MySendBasicTrajectory = (int(*)(TrajectoryPoint)) GetProcAddress(commandLayer_handle, "SendBasicTrajectory");
 
 	// additional functions for force control
@@ -386,6 +388,60 @@ void PushP2P(TrajectoryPoint fromPoint, TrajectoryPoint toPoint, float x_speed, 
 	MySendBasicTrajectory(currentPoint);
 }
 
+void MoveToPoint(float3 point)
+{
+	TrajectoryPoint* start = CartesianToPoint(point);
+	MySendBasicTrajectory(*start);
+	//free(start);
+}
+
+float3 GetNewDstByForce(float3 oldDst, float3 force)
+{
+	cout << force << length(force) << endl;
+	if (length(force) < 5)
+	{
+		return oldDst;
+	}
+	return oldDst +(float3)(getNormal() * 0.0005);
+}
+
+float3 GetMyForce()
+{
+	float3 force;
+	CartesianPosition curr_force;
+	MyGetCartesianForce(curr_force);
+	force = PointToCartesian(curr_force);
+	return force;
+}
+
+void GetToPointWithForceControl(float3 dst)
+{
+	CartesianPosition curr_point;
+	float3 force, start_force = GetMyForce();
+	int counter = 0;
+	while (counter < 100) // need to sert maximum of moving time to be 2 seconds
+	{
+		counter++;
+		MyGetCartesianPosition(curr_point);
+		if (length(PointToCartesian(curr_point) - dst) < 0.01)// got to point
+		{
+			MyEraseAllTrajectories();
+			return; // stop the moveing
+		}
+
+		force = GetMyForce();
+		dst = GetNewDstByForce(dst, force - start_force); // change dst by the position of the board
+		
+		MoveToPoint(dst);
+		Sleep(5);
+		MyEraseAllTrajectories();
+	}
+}
+
+
+
+
+
 
 void waitUntilGetToPoint(float3 wanted_pos)
 {
@@ -395,20 +451,19 @@ void waitUntilGetToPoint(float3 wanted_pos)
 	cout << "dst: " << wanted_pos << endl;
 	while (true)
 	{
-		counter++;
 		//cout << float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } << endl;
-		Sleep(2);
+		
 		MyGetCartesianPosition(cur_point);
 		if(length(float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } - wanted_pos) < 0.008 || (float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } == priv && length(float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } - wanted_pos) < 0.01))
-			return;
+			return; // Got to point
 		priv = float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z };
-		if (counter == 100) {
-			counter = 0;
-			cout << "dst: " << wanted_pos << ", pos: " << float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } << endl;
-			TrajectoryPoint* pos = CartesianToPoint(wanted_pos);
-			MySendBasicTrajectory(*pos);
-			free(pos);
-		}
+		//cout << "dst: " << wanted_pos << ", pos: " << float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } << endl;
+		TrajectoryPoint* pos = CartesianToPoint(wanted_pos);
+		MySendBasicTrajectory(*pos);
+		Sleep(2);
+		MyEraseAllTrajectories();
+		free(pos);
+		
 	}
 	//CartesianPosition pos = MyGetCartesianForce();
 }
@@ -448,7 +503,43 @@ float3 nextPointByForce(float3 nextPoint, float3 normalBoard)
 	//return nextPoint + force_corr;
 }
 
-void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
+
+float3 GoToTheBoard(float3 start_point)
+{
+	float3 start_force = GetMyForce(), curr_point = start_point, my_force;
+	CartesianPosition curr_pos;
+	float diff;
+	int counter = 0;
+	while (true)
+	{
+		my_force = GetMyForce();
+		//my_force.z = 0;
+		//start_force.z = 0;
+		diff = length(start_force - my_force);
+		cout << "force diff: " << diff << endl;
+		if (diff > 1.5 && counter > 20)
+		{
+			cout << "found the board!" << curr_point << endl;
+			return curr_point;
+		}
+
+		MoveToPoint(curr_point);
+		Sleep(4);
+		MyEraseAllTrajectories();
+		MyGetCartesianPosition(curr_pos);
+		if (length(PointToCartesian(curr_pos) - curr_point) < 0.01) // got to the point, but not the board yet
+		{
+			counter++;
+			curr_point -= (float3)(getNormal() * 0.0002);
+			start_force = GetMyForce();
+			cout << "other point!" << curr_point << endl;
+		}
+	}
+}
+
+
+
+void mainLoopForDrawLine(vector<float3> line, float3 normalBoard, bool drawing)
 {
 	//cout << normalBoard << " - the normal" << endl;
 	bool finishDraw = false;
@@ -468,18 +559,23 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard)
 			continue;
 		}
 		//cout << "3d: " << point << endl;
-
-		CartesianPosition force;
-		MyGetCartesianForce(force);
+		if(drawing)
+			GetToPointWithForceControl(point);
+		else
+		{
+			priv = pos;
+			TrajectoryPoint* pos = CartesianToPoint(point);
+			MySendBasicTrajectory(*pos);
+		}
 		//cout << "my pos: " << translateToBoardCoordinates(PointToCartesian(force)) << ", " << PointToCartesian(force) << endl;
 		//point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
-		TrajectoryPoint* pos = CartesianToPoint(point);//, float3{-1.5,-0.33,-2.99});
+		//TrajectoryPoint* pos = CartesianToPoint(point);//, float3{-1.5,-0.33,-2.99});
 		//PushP2P(*priv, *pos, 0.15f, 3.0f);
-		priv = pos;
+		//priv = pos;
 		//TrajectoryPoint* pos = CartesianToPoint(point);
-		MySendBasicTrajectory(*pos);
-		free(priv);
-		Sleep(2);
+		//MySendBasicTrajectory(*pos);
+		//free(priv);
+		//Sleep(2);
 		//waitUntilGetToPoint(point);
 	}
 }
@@ -503,7 +599,7 @@ void drawRoad(vector<float2> road, vector<float3> basis)
 		}
 
 		vector<float3> line = getLine(LEFT_DOWN, basis, priv, curr, 10, true);
-		mainLoopForDrawLine(line, basis[2]);
+		//mainLoopForDrawLine(line, basis[2]);
 	}
 }
 
@@ -546,7 +642,7 @@ void drawFile(string fileName)
 			float2 first_point = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
 			float2 second_point = float2{std::stof(line_splited[3]), std::stof(line_splited[4])};
 			bool drawing = line_splited[5] == "T";
-			mainLoopForDrawLine(getLine(LEFT_DOWN, basis, first_point, second_point, 100, drawing), basis[2]);
+			mainLoopForDrawLine(getLine(LEFT_DOWN, basis, first_point, second_point, 100, drawing), basis[2], drawing);
 			//cout << "first point:" << first_point << " , second:" << second_point << endl;
 		}
 		else if (line_splited[0] == "C")
@@ -555,7 +651,7 @@ void drawFile(string fileName)
 			float radios = std::stof(line_splited[3]);
 			float start_angle = std::stof(line_splited[4]);
 			float draw_angle = std::stof(line_splited[5]);
-			mainLoopForDrawLine(getCircArc(LEFT_DOWN, basis, center, radios, start_angle, draw_angle, 100), basis[2]);
+			mainLoopForDrawLine(getCircArc(LEFT_DOWN, basis, center, radios, start_angle, draw_angle, 100), basis[2], 1);
 		}
 	}
 }
@@ -577,15 +673,33 @@ int main(void)
 	///return 0;
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 	//cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
-	TrajectoryPoint* start = CartesianToPoint(0.4514, 0.2646, 0.5031);
+	TrajectoryPoint* start = CartesianToPoint(0.4514, 0.2646, 0.6031);
 	MySendBasicTrajectory(*start);
+	Sleep(7000);
+	GoToTheBoard(float3{ 0.4514, 0.2646, 0.6031 });
+	
+	
+	/*TrajectoryPoint* start = CartesianToPoint(0.4514, 0.2646, 0.5031);
+	MySendBasicTrajectory(*start);
+	Sleep(7000);
+	*///GoToTheBoard(float3{ 0.4514, 0.2646, 0.5031 });
+
+	
+	
+	//GetToPointWithForceControl(float3{ 0.4514, 0.2646, 0.5031 });
+	
+	
+	
+	
+	//Sleep(5000);
+	//MyEraseAllTrajectories();
 	//free(start);
 	//start = CartesianToPoint(-0.4911, 0.1204, 0.5203,-1.7394,-0.0947,-3.1058);
 	//MySendBasicTrajectory(*start);
 	//free(start);
 
 	
-	drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\Hello2.txt"));
+	//drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\Hello2.txt"));
 	
 	
 	//vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 0.8, 0.2 }, float2{ 1.1, 0.2}, 10, true);
