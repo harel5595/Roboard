@@ -180,5 +180,5 @@ def compileWord(string, height, X, Y, path):
 
 
 if __name__ == '__main__':
-    compileWord("QUESTION", 0.08, 0.80, 0.15, "Hello2.txt")
+    compileWord("QUESTION", 0.08, -0.1, 0.2, "Hello2.txt")
     compileWord("MARK!", 0.08, 0.85, 0.05, "World2.txt")

@@ -93,9 +93,9 @@ TrajectoryPoint * CartesianToPoint(float x, float y, float z)
 	pos.ThetaX = -1.57;
 	pos.ThetaY = -0.1145;
 	pos.ThetaZ = -2.9938;
-	point.Fingers.Finger1 = 6486;
-	point.Fingers.Finger2 = 6312;
-	point.Fingers.Finger3 = 6312;
+	point.Fingers.Finger1 = 6986;
+	point.Fingers.Finger2 = 6872;
+	point.Fingers.Finger3 = 7112;
 
 
 
@@ -124,9 +124,9 @@ TrajectoryPoint* CartesianToPoint(float x, float y, float z, float thetaX, float
 	pos.ThetaX = thetaX;
 	pos.ThetaY = thetaY;
 	pos.ThetaZ = thetaZ;
-	point.Fingers.Finger1 = 6486;
-	point.Fingers.Finger2 = 6312;
-	point.Fingers.Finger3 = 6312;
+	point.Fingers.Finger1 = 6986;
+	point.Fingers.Finger2 = 6812;
+	point.Fingers.Finger3 = 6812;
 
 
 
@@ -506,9 +506,10 @@ float3 nextPointByForce(float3 nextPoint, float3 normalBoard)
 
 float3 GoToTheBoard(float3 start_point)
 {
-	float3 start_force = GetMyForce(), curr_point = start_point, my_force;
+	float3 start_force = GetMyForce(), curr_point = start_point, my_force, priv_pos, priv_priv_pos, priv_priv_priv_pos;
+	vector<float3> road;
 	CartesianPosition curr_pos;
-	float diff;
+	float diff, priv_diff = 0, priv_priv_diff = 0, priv_priv_priv_diff = 0, priv_priv_priv_priv_diff = 0, priv_priv_priv_priv_priv_diff = 0;
 	int counter = 0;
 	while (true)
 	{
@@ -517,10 +518,12 @@ float3 GoToTheBoard(float3 start_point)
 		//start_force.z = 0;
 		diff = length(start_force - my_force);
 		cout << "force diff: " << diff << endl;
-		if (diff > 1.5 && counter > 20)
+		if (diff + priv_diff + priv_priv_diff + priv_priv_priv_diff + priv_priv_priv_priv_diff + priv_priv_priv_priv_priv_diff > 5.4 && counter > 200 && diff > 0.7 && priv_diff > 0.7 && priv_priv_diff > 0.7 && priv_priv_priv_diff > 0.7 && priv_priv_priv_priv_diff > 0.7 && priv_priv_priv_priv_priv_diff > 0.7)
 		{
 			cout << "found the board!" << curr_point << endl;
-			return curr_point;
+			MyGetCartesianPosition(curr_pos);
+
+			return PointToCartesian(curr_pos) + (float3)(getNormal() * 0.005);//road[road.size() - 160];
 		}
 
 		MoveToPoint(curr_point);
@@ -534,6 +537,13 @@ float3 GoToTheBoard(float3 start_point)
 			start_force = GetMyForce();
 			cout << "other point!" << curr_point << endl;
 		}
+		priv_priv_priv_priv_priv_diff = priv_priv_priv_priv_diff;
+		priv_priv_priv_priv_diff = priv_priv_priv_diff;
+		priv_priv_priv_diff = priv_priv_diff;
+		priv_priv_diff = priv_diff;
+		priv_diff = diff;
+
+		road.push_back(curr_point);
 	}
 }
 
@@ -553,20 +563,21 @@ void mainLoopForDrawLine(vector<float3> line, float3 normalBoard, bool drawing)
 	TrajectoryPoint* priv = NULL;
 	for (auto point : line)
 	{
-		if (priv == NULL)
-		{
-			priv = CartesianToPoint(point);
-			continue;
-		}
+		//if (priv == NULL)
+		//{
+			//priv = CartesianToPoint(point);
+			//continue;
+		//}
 		//cout << "3d: " << point << endl;
-		if(drawing)
-			GetToPointWithForceControl(point);
-		else
-		{
-			priv = pos;
+		//if(drawing)
+			//GetToPointWithForceControl(point);
+		//else
+		//{
+			//priv = pos;
 			TrajectoryPoint* pos = CartesianToPoint(point);
 			MySendBasicTrajectory(*pos);
-		}
+			//Sleep(5);
+	//	}
 		//cout << "my pos: " << translateToBoardCoordinates(PointToCartesian(force)) << ", " << PointToCartesian(force) << endl;
 		//point = nextPointByForce(wanted_force, point, float3{ force.Coordinates.X,force.Coordinates.Y,force.Coordinates.Z }, normalBoard);
 		//TrajectoryPoint* pos = CartesianToPoint(point);//, float3{-1.5,-0.33,-2.99});
@@ -587,38 +598,11 @@ void disconnectFromRobot()
 }
 
 
-void drawRoad(vector<float2> road, vector<float3> basis)
-{
-	float2 priv = float2{ 0,0 };
-	for (auto curr : road)
-	{
-		if (priv == float2{ 0,0 })
-		{
-			priv = curr;
-			continue;
-		}
-
-		vector<float3> line = getLine(LEFT_DOWN, basis, priv, curr, 10, true);
-		//mainLoopForDrawLine(line, basis[2]);
-	}
-}
-
-
-void drawHI()
-{
-	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
-	vector<float2> road = drawCapH(float2{ 0.8, 0.2 });
-	drawRoad(road, basis);
-	road = drawCapI(float2{ 1.2, 0.2 });
-	drawRoad(road, basis);
-}
-
 
 // L:cord_x,cord_y:cord_x,cord_y:T/F
 
-void drawFile(string fileName)
+void drawFile(string fileName, vector<float3> basis)
 {
-	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 	ifstream MyReadFile(fileName);
 	string line;
 	string delimiter = ":";
@@ -642,7 +626,7 @@ void drawFile(string fileName)
 			float2 first_point = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
 			float2 second_point = float2{std::stof(line_splited[3]), std::stof(line_splited[4])};
 			bool drawing = line_splited[5] == "T";
-			mainLoopForDrawLine(getLine(LEFT_DOWN, basis, first_point, second_point, 100, drawing), basis[2], drawing);
+			mainLoopForDrawLine(getLine(basis, first_point, second_point, 100, drawing), basis[2], drawing);
 			//cout << "first point:" << first_point << " , second:" << second_point << endl;
 		}
 		else if (line_splited[0] == "C")
@@ -651,9 +635,36 @@ void drawFile(string fileName)
 			float radios = std::stof(line_splited[3]);
 			float start_angle = std::stof(line_splited[4]);
 			float draw_angle = std::stof(line_splited[5]);
-			mainLoopForDrawLine(getCircArc(LEFT_DOWN, basis, center, radios, start_angle, draw_angle, 100), basis[2], 1);
+			mainLoopForDrawLine(getCircArc(basis, center, radios, start_angle, draw_angle, 100), basis[2], 1);
 		}
 	}
+}
+
+
+vector<float3> findTheBoard()
+{
+	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
+	//cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
+	TrajectoryPoint* start = CartesianToPoint(0.4514, 0.2646, 0.7031);
+	MySendBasicTrajectory(*start);
+	Sleep(7000);
+	float3 right_up = GoToTheBoard(float3{ 0.4514, 0.2646, 0.7031 });
+	MySendBasicTrajectory(*start);
+	Sleep(4000);
+	start = CartesianToPoint(0.5014, 0.1646, 0.5031);
+	MySendBasicTrajectory(*start);
+	Sleep(4000);
+	float3 right_down = GoToTheBoard(float3{ 0.5014, 0.2646, 0.5031 });
+	MySendBasicTrajectory(*start);
+	Sleep(4000);
+	start = CartesianToPoint(0.3514, 0.1646, 0.5031);
+	MySendBasicTrajectory(*start);
+	Sleep(4000);
+	float3 left_down = GoToTheBoard(float3{ 0.3514, 0.2646, 0.5031 });
+	MySendBasicTrajectory(*start);
+	Sleep(4000);
+	free(start);
+	return getNewBasis(left_down, right_down, right_up);
 }
 
 
@@ -671,14 +682,7 @@ int main(void)
 	//drawHI();
 
 	///return 0;
-	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
-	//cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
-	TrajectoryPoint* start = CartesianToPoint(0.4514, 0.2646, 0.6031);
-	MySendBasicTrajectory(*start);
-	Sleep(7000);
-	GoToTheBoard(float3{ 0.4514, 0.2646, 0.6031 });
-	
-	
+	vector<float3> basis = findTheBoard();
 	/*TrajectoryPoint* start = CartesianToPoint(0.4514, 0.2646, 0.5031);
 	MySendBasicTrajectory(*start);
 	Sleep(7000);
@@ -696,10 +700,9 @@ int main(void)
 	//free(start);
 	//start = CartesianToPoint(-0.4911, 0.1204, 0.5203,-1.7394,-0.0947,-3.1058);
 	//MySendBasicTrajectory(*start);
-	//free(start);
 
 	
-	//drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\Hello2.txt"));
+	drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\Hello2.txt"), basis);
 	
 	
 	//vector<float3> line = getLine(LEFT_DOWN, basis, float2{ 0.8, 0.2 }, float2{ 1.1, 0.2}, 10, true);
