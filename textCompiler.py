@@ -56,8 +56,9 @@ lengths['G'] = 1
 lines['H'] = [('L', (0, 0), (0, 1), True),
               ('L', (0, 1), (0, 0.5), False),
               ('L', (0, 0.5), (0.5, 0.5), True),
-              ('L', (0.5, 0.5), (0.5, 1), False),
-              ('L', (0.5, 1), (0.5, 0), True)]
+              ('L', (0.5, 0.5), (0.5, 0), False),
+              ('L', (0.5, 0), (0.5, 1), True),
+              ('L', (0.5, 1), (0.5, 0), False)]
 lengths['H'] = 0.5
 
 lines['I'] = [('L', (0, 0), (0, 1), False),
@@ -203,10 +204,13 @@ def compileWord(string, height, X, Y, path):
     with open(path, "a") as myFile:
         myFile.write(f"L:{X}:{Y}:{X}:{Y}:F:\n")  # brings robot to start
         for c in string:
+            if 0.35<X < 0.7:
+                X += 0.35
             for line in lines[c]:
                 # print(getLineString(line, X, Y, height))
                 myFile.write(getLineString(line, X, Y, height))
             X += lengths[c] * height  # adds kerning
+            
             myFile.write(f"L:{round(X,4)}:{round(Y,4)}:{round(X + 0.1 * height,4)}:{round(Y,4)}:F:\n")
             X += 0.1 * height
     return X
@@ -218,7 +222,10 @@ def wordLength(word, scale):
     return length * scale
 
 def cutIntoLines(text, scale, lineLimit):
-    words = text.split()
+    if " " in text:
+        words = text.split()
+    else:
+        return [text]
     lines = []
     currLine = []
     currLineLength = 0
@@ -247,7 +254,7 @@ def compileText(text, scale, X, Y, lineLengthLimit, lineAmountLimit, spacing, pa
 
 if __name__ == '__main__':
 
-    text = 'HELLO THIS IS A LONG TEXT TO TRY TO CUT INTO SHORTER LINES'
+    text = 'HHHHHH'
     print(cutIntoLines(text, 1, 8))
     #compileWord('HELLO', 1, 10, 40, 'MyTrialFile.txt') # 8, 10, 0.5,
-    compileText(text, 1, 10, 40, 8, 10, 0.5, 'MyTrialFile.txt') #
+    compileText(text, scale=0.1, X=0, Y=0.05, lineLengthLimit=8, lineAmountLimit=10, spacing=0, path='MyTrialFile.txt') #
