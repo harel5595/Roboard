@@ -5,6 +5,8 @@ float3 glob_e2;
 float3 glob_e3;
 float3 glob_baseBoard;
 
+float2 quad_bezier_curve_path(float t, float2 p1, float2 p2, float2 p3);
+
 vector<float3> getNewBasis(float3 baseBoard, float3 XBoard, float3 YBoard)
 {
 	float3 relX = XBoard - baseBoard;
@@ -90,32 +92,6 @@ vector<float3> getCircArc(float2 center, float rad, float alpha0, float angle, i
 }
 
 
-vector<float3> getQuadBezierCurve(float3 baseBoard, vector<float3> basis, float2 p1, float2 p2, float2 p3, int numOfPoints)
-{
-	vector<float3> positions;
-
-	for (float t = 0; t <= 1.01; t += (1.0 / numOfPoints))
-	{
-		float2 board_point = quad_bezier_curve_path(t, p1, p2, p3);
-		positions.push_back(baseBoard + translateToRealCoordinates(board_point));
-	}
-	return positions;
-
-}
-
-vector<float3> getCubicBezierCurve(float3 baseBoard, vector<float3> basis, float2 p1, float2 p2, float2 p3, float2 p4, int numOfPoints)
-{
-	vector<float3> positions;
-
-	for (float t = 0; t <= 1.01; t += (1.0 / numOfPoints))
-	{
-		float2 board_point = cub_bezier_curve_path(t, p1, p2, p3, p4);
-		positions.push_back(baseBoard + translateToRealCoordinates(board_point));
-	}
-	return positions;
-
-}
-
 
 float2 lin_bezier_curve_path(float t, float2 p1, float2 p2)
 {
@@ -132,4 +108,32 @@ float2 quad_bezier_curve_path(float t, float2 p1, float2 p2, float2 p3)
 float2 cub_bezier_curve_path(float t, float2 p1, float2 p2, float2 p3, float2 p4)
 {
 	return ((1 - t) * (quad_bezier_curve_path(t, p1, p2, p3)) + (t * (quad_bezier_curve_path(t, p2, p3, p4))));
+}
+
+
+
+vector<float3> getQuadBezierCurve(float2 p1, float2 p2, float2 p3, int numOfPoints)
+{
+	vector<float3> positions;
+
+	for (float t = 0; t <= 1.01; t += (1.0 / numOfPoints))
+	{
+		float2 board_point = quad_bezier_curve_path(t, p1, p2, p3);
+		positions.push_back(glob_baseBoard + translateToRealCoordinates(board_point));
+	}
+	return positions;
+
+}
+
+vector<float3> getCubicBezierCurve(float2 p1, float2 p2, float2 p3, float2 p4, int numOfPoints)
+{
+	vector<float3> positions;
+
+	for (float t = 0; t <= 1.01; t += (1.0 / numOfPoints))
+	{
+		float2 board_point = cub_bezier_curve_path(t, p1, p2, p3, p4);
+		positions.push_back(glob_baseBoard + translateToRealCoordinates(board_point));
+	}
+	return positions;
+
 }

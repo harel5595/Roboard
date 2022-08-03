@@ -204,8 +204,8 @@ def compileWord(string, height, X, Y, path):
     with open(path, "a") as myFile:
         myFile.write(f"L:{X}:{Y}:{X}:{Y}:F:\n")  # brings robot to start
         for c in string:
-            if 0.35<X < 0.7:
-                X += 0.35
+            #if 0.35<X < 0.7:
+            #   X += 0.35
             for line in lines[c]:
                 # print(getLineString(line, X, Y, height))
                 myFile.write(getLineString(line, X, Y, height))
@@ -222,20 +222,21 @@ def wordLength(word, scale):
     return length * scale
 
 def cutIntoLines(text, scale, lineLimit):
-    if " " in text:
-        words = text.split()
-    else:
-        return [text]
+    words = text.split()
     lines = []
     currLine = []
     currLineLength = 0
     for word in words:
+        print(f'hello! : CL: {currLine}, CLL: {currLineLength}, w: {word}')
         if currLineLength + wordLength(word, scale) > lineLimit:
+            print(f'hello! : CL: {currLine}, CLL: {currLineLength}, w: {word}')
             lines.append(currLine)
             currLine = []
             currLineLength = 0
         currLine.append(word)
         currLineLength += wordLength(word, scale)
+    if currLine:
+        lines.append(currLine)
     return lines
 
 def compileText(text, scale, X, Y, lineLengthLimit, lineAmountLimit, spacing, path):
@@ -246,7 +247,7 @@ def compileText(text, scale, X, Y, lineLengthLimit, lineAmountLimit, spacing, pa
         print('Error: too many lines')
         return
     for line in lines:
-        print(' '.join(line))
+        #print(' '.join(line))
         newX = compileWord(' '.join(line), scale, X, Y, path)
         with open(path, 'a') as myFile:
             myFile.write(f"L:{round(newX, 4)}:{round(Y, 4)}:{round(X, 4)}:{round(Y - (1 + spacing) * scale, 4)}:F:\n")
@@ -254,7 +255,7 @@ def compileText(text, scale, X, Y, lineLengthLimit, lineAmountLimit, spacing, pa
 
 if __name__ == '__main__':
 
-    text = 'HHHHHH'
+    text = 'HELLO WORLD'
     print(cutIntoLines(text, 1, 8))
     #compileWord('HELLO', 1, 10, 40, 'MyTrialFile.txt') # 8, 10, 0.5,
-    compileText(text, scale=0.1, X=0, Y=0.05, lineLengthLimit=8, lineAmountLimit=10, spacing=0, path='MyTrialFile.txt') #
+    compileText(text, scale=0.1, X=0.1, Y=0.15, lineLengthLimit=20, lineAmountLimit=10, spacing=0, path='MyTrialFile2.txt') #

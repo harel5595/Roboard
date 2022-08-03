@@ -90,9 +90,9 @@ TrajectoryPoint * CartesianToPoint(float x, float y, float z)
 	pos.Y = y;
 	pos.Z = z;
 	 
-	pos.ThetaX = -1.57;
-	pos.ThetaY = -0.1145;
-	pos.ThetaZ = -2.9938;
+	pos.ThetaX = 1.63;
+	pos.ThetaY = -0.0497;
+	pos.ThetaZ = 0.0243;
 	point.Fingers.Finger1 = 6986;
 	point.Fingers.Finger2 = 6872;
 	point.Fingers.Finger3 = 7112;
@@ -535,7 +535,7 @@ float3 GoToTheBoard(float3 start_point)
 		{
 			counter++;
 			other_counter = 0;
-			curr_point -= (float3)(getNormal() * 0.0002);
+			curr_point += (float3)(getNormal() * 0.0002);
 			start_force = GetMyForce();
 			cout << "other point!" << curr_point << endl;
 		}
@@ -551,7 +551,7 @@ float3 GoToTheBoard(float3 start_point)
 
 
 
-void mainLoopForDrawLine(vector<float3> line, bool drawing)
+void mainLoopForDrawLine(vector<float3> line)
 {
 	//cout << normalBoard << " - the normal" << endl;
 	bool finishDraw = false;
@@ -607,7 +607,7 @@ void drawFile(string fileName)
 			float2 first_point = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
 			float2 second_point = float2{std::stof(line_splited[3]), std::stof(line_splited[4])};
 			bool drawing = line_splited[5] == "T";
-			mainLoopForDrawLine(getLine(first_point, second_point, 200, drawing), drawing);
+			mainLoopForDrawLine(getLine(first_point, second_point, 200, drawing));
 			//cout << "first point:" << first_point << " , second:" << second_point << endl;
 		}
 		else if (line_splited[0] == "C")
@@ -616,7 +616,22 @@ void drawFile(string fileName)
 			float radios = std::stof(line_splited[3]);
 			float start_angle = std::stof(line_splited[4]);
 			float draw_angle = std::stof(line_splited[5]);
-			mainLoopForDrawLine(getCircArc(center, radios, start_angle, draw_angle, 100), 1);
+			mainLoopForDrawLine(getCircArc(center, radios, start_angle, draw_angle, 100));
+		}
+		else if (line_splited[0] == "Q")
+		{
+			float2 first_point = float2{ std::stof(line_splited[1]), std::stof(line_splited[2]) };
+			float2 second_point = float2{ std::stof(line_splited[3]), std::stof(line_splited[4]) };
+			float2 third_point = float2{ std::stof(line_splited[5]), std::stof(line_splited[6]) };
+			mainLoopForDrawLine(getQuadBezierCurve(first_point, second_point, third_point, 100));
+		}
+		else if (line_splited[0] == "B")
+		{
+			float2 first_point = float2{ std::stof(line_splited[1]), std::stof(line_splited[2]) };
+			float2 second_point = float2{ std::stof(line_splited[3]), std::stof(line_splited[4]) };
+			float2 third_point = float2{ std::stof(line_splited[5]), std::stof(line_splited[6]) };
+			float2 fourth_point = float2{ std::stof(line_splited[7]), std::stof(line_splited[8]) };
+			mainLoopForDrawLine(getCubicBezierCurve(first_point, second_point, third_point, fourth_point, 100));
 		}
 	}
 }
@@ -626,43 +641,45 @@ vector<float3> findTheBoard()
 {
 	vector<float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
 	//cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
-	TrajectoryPoint* start = CartesianToPoint(0.4514, 0.2646, 0.7031);
+	TrajectoryPoint* start = CartesianToPoint(0.3399, -0.3848, 0.6489);
 	MySendBasicTrajectory(*start);
 	Sleep(7000);
-	float3 right_up = GoToTheBoard(float3{ 0.4514, 0.2646, 0.7031 });
+	float3 right_up = GoToTheBoard(float3{ 0.3399, -0.3848, 0.6489});
 	MySendBasicTrajectory(*start);
 	Sleep(4000);
-	start = CartesianToPoint(0.5014, 0.1646, 0.5031);
+	start = CartesianToPoint(0.5014, -0.1646, 0.5031);
 	MySendBasicTrajectory(*start);
+
+
 	Sleep(4000);
-	float3 right_down = GoToTheBoard(float3{ 0.5014, 0.2646, 0.5031 });
+	float3 right_down = GoToTheBoard(float3{ 0.5014, -0.2646, 0.5031 });
 	MySendBasicTrajectory(*start);
 	Sleep(4000);
 
 
-	start = CartesianToPoint(0.2313, 0.3277, 0.5060);
+	start = CartesianToPoint(0.2313, -0.3277, 0.5060);
 	MySendBasicTrajectory(*start);
 	Sleep(3500);
 
-	start = CartesianToPoint(-0.1774, 0.3540, 0.5199);
+	start = CartesianToPoint(-0.1774, -0.3540, 0.5199);
 	MySendBasicTrajectory(*start);
 	Sleep(4000);
 
 
-	start = CartesianToPoint(-0.5014, 0.1646, 0.5031);
+	start = CartesianToPoint(-0.5014, -0.1646, 0.5031);
 	MySendBasicTrajectory(*start);
 	Sleep(10000);
-	float3 left_down = GoToTheBoard(float3{ -0.5014, 0.2646, 0.5031 });
+	float3 left_down = GoToTheBoard(float3{ -0.5014, -0.2646, 0.5031 });
 	MySendBasicTrajectory(*start);
 	Sleep(4000);
 	free(start);
 
 	basis = getNewBasis(left_down, right_down, right_up);
-	left_down += (float3)(getNormal() * 0.007);
-	right_down += (float3)(getNormal() * 0.007);
-	right_up += (float3)(getNormal() * 0.007);
+	left_down -= (float3)(getNormal() * 0.112);
+	right_down -= (float3)(getNormal() * 0.112);
+	right_up -= (float3)(getNormal() * 0.112);
 
-	return getNewBasis(left_down, right_down, right_up);
+	return getNewBasis(right_down, left_down, right_up);
 }
 
 
@@ -711,11 +728,11 @@ int main(void)
 	//MySetTorqueSafetyFactor(15);
 	//MyInitFingers();
 	Sleep(2000);
-	vector<float3> basis; //= findTheBoard();
- 	//save_basis(basis);
-	load_basis(basis);
+	vector<float3> basis = findTheBoard();
+ 	save_basis(basis);
+	//load_basis(basis);
 	
-	drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\MyTrialFile.txt"));
+	drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\MyTrialFile2.txt"));
 
 	disconnectFromRobot();
 
