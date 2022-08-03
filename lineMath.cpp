@@ -90,13 +90,46 @@ vector<float3> getCircArc(float2 center, float rad, float alpha0, float angle, i
 }
 
 
-vector<float3> getCurve(float3 baseBoard, float2(*gamma)(float), int numOfPoints, bool drawing)
+vector<float3> getQuadBezierCurve(float3 baseBoard, vector<float3> basis, float2 p1, float2 p2, float2 p3, int numOfPoints)
 {
-	float3 base = drawing ? baseBoard : (float3)(baseBoard + (0.01 * glob_e3));
 	vector<float3> positions;
-	for (float t = 0; t <= 1; t += (1.0 / numOfPoints))
+
+	for (float t = 0; t <= 1.01; t += (1.0 / numOfPoints))
 	{
-		positions.push_back(base + translateToRealCoordinates(gamma(t)));
+		float2 board_point = quad_bezier_curve_path(t, p1, p2, p3);
+		positions.push_back(baseBoard + translateToRealCoordinates(board_point));
 	}
 	return positions;
+
+}
+
+vector<float3> getCubicBezierCurve(float3 baseBoard, vector<float3> basis, float2 p1, float2 p2, float2 p3, float2 p4, int numOfPoints)
+{
+	vector<float3> positions;
+
+	for (float t = 0; t <= 1.01; t += (1.0 / numOfPoints))
+	{
+		float2 board_point = cub_bezier_curve_path(t, p1, p2, p3, p4);
+		positions.push_back(baseBoard + translateToRealCoordinates(board_point));
+	}
+	return positions;
+
+}
+
+
+float2 lin_bezier_curve_path(float t, float2 p1, float2 p2)
+{
+	return (1 - t) * p1 + t * p2;
+
+}
+
+
+float2 quad_bezier_curve_path(float t, float2 p1, float2 p2, float2 p3)
+{
+	return ((1 - t) * (lin_bezier_curve_path(t, p1, p2)) + (t * (lin_bezier_curve_path(t, p2, p3))));
+}
+
+float2 cub_bezier_curve_path(float t, float2 p1, float2 p2, float2 p3, float2 p4)
+{
+	return ((1 - t) * (quad_bezier_curve_path(t, p1, p2, p3)) + (t * (quad_bezier_curve_path(t, p2, p3, p4))));
 }
