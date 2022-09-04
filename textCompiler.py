@@ -255,7 +255,7 @@ def compileText(text, scale, X, Y, lineLengthLimit, lineAmountLimit, spacing, pa
 
 if __name__ == '__main__':
 
-    text = 'HELLO WORLD'
+    text = 'HELLO FROM THE OTHER SIDE I MUST HAVE CALLED A THOUSAND TIMES'
     print(cutIntoLines(text, 1, 8))
     #compileWord('HELLO', 1, 10, 40, 'MyTrialFile.txt') # 8, 10, 0.5,
-    compileText(text, scale=0.1, X=0.1, Y=0.15, lineLengthLimit=20, lineAmountLimit=10, spacing=0, path='MyTrialFile2.txt') #
+    compileText(text, scale=0.05, X=-0.05, Y=0.23, lineLengthLimit=20, lineAmountLimit=10, spacing=0.005, path='hello.txt') #
