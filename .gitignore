@@ -1,2 +1,5 @@
+.gitignore
 .vs/
 EyalHarelJonathan/.vs/
+SVGtrans.py
+.idea
