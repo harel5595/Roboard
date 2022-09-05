@@ -3,7 +3,6 @@ from alphabet import make_letters
 lines, lengths = make_letters()
 
 
-
 def getLineString(line, X, Y, height):
     """
     this function writes one line, that is, a single segment instruction
@@ -115,8 +114,6 @@ def compileText(text, scale, X, Y, lineLengthLimit, lineAmountLimit, spacing, pa
 if __name__ == '__main__':
     text = 'HELLO FROM THE OTHER SIDE I MUST HAVE CALLED A THOUSAND TIMES'
     print(cutIntoLines(text, 0.05, 0.4))
-    #compileWord('HELLO', 1, 10, 40, 'MyTrialFile.txt') # 8, 10, 0.5,
-    compileText(text, scale=0.05, X=-0.05, Y=0.23, lineLengthLimit=0.4, lineAmountLimit=10, spacing=0.01, path='hello.txt') #
-
-
-
+    # compileWord('HELLO', 1, 10, 40, 'MyTrialFile.txt') # 8, 10, 0.5,
+    compileText(text, scale=0.05, X=-0.05, Y=0.23, lineLengthLimit=0.4, lineAmountLimit=10, spacing=0.01,
+                path='hello.txt')  #
