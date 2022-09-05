@@ -20,7 +20,7 @@ def getLineString(line, X, Y, height):
         return f"C:{round(X + line[1][0] * height, 4)}:{round(Y + line[1][1] * height, 4)}:{round(line[2] * height, 4)}:{round(line[3], 4)}:{round(line[4], 4)}:\n"
 
 
-def compileWord(string, height, X, Y, path):
+def compileWord(string, height, X, Y, word_spacing, path):
     """
     this function writes whole words, by using getLineString
     :param string: the string to write
@@ -41,11 +41,11 @@ def compileWord(string, height, X, Y, path):
             X += lengths[character] * height  # adds kerning
 
             myFile.write(f"L:{round(X, 4)}:{round(Y, 4)}:{round(X + 0.1 * height, 4)}:{round(Y, 4)}:F:\n")
-            X += 0.1 * height
+            X += word_spacing * height
     return X
 
 
-def wordLength(word, scale):
+def wordLength(word, word_spacing, scale):
     """
     given a scale and a single word, returns its length.
     :param word: the word
@@ -54,15 +54,16 @@ def wordLength(word, scale):
     """
     length = 0
     for c in word:
-        length += lengths[c] + 0.1
+        length += lengths[c] + word_spacing
     return length * scale
 
 
-def cutIntoLines(text, scale, lineLimit):
+def cutIntoLines(text, scale, word_spacing, lineLimit):
     """
     cuts a long text into neat short lines. since our board isn't infinite, we need to have a limit on line length.
     :param text: the text to cut.
     :param scale: the scaling factor of the text.
+    :param word_spacing: spacing between letters
     :param lineLimit: the maximum amount of lines, because our board is also limited in the X direction.
     :return: a list of the resulting lines.
     """
@@ -71,18 +72,18 @@ def cutIntoLines(text, scale, lineLimit):
     currLine = []
     currLineLength = 0
     for word in words:
-        if currLineLength + wordLength(word, scale) > lineLimit:
+        if currLineLength + wordLength(word, scale, word_spacing) > lineLimit:
             lines.append(currLine)
             currLine = []
             currLineLength = 0
         currLine.append(word)
-        currLineLength += wordLength(word, scale)
+        currLineLength += wordLength(word, scale, word_spacing)
     if currLine:
         lines.append(currLine)
     return lines
 
 
-def compileText(text, scale, X, Y, lineLengthLimit, lineAmountLimit, spacing, path):
+def compileText(text, scale, X, Y, lineLengthLimit, lineAmountLimit, word_spacing, spacing, path):
     """
     this function bundles everything up, the main function calls it directly.
     :param text: the text to write.
@@ -91,19 +92,20 @@ def compileText(text, scale, X, Y, lineLengthLimit, lineAmountLimit, spacing, pa
     :param Y: starting Y coordinate
     :param lineLengthLimit: limit on the length of the lines, board isnt infinite in Y direction.
     :param lineAmountLimit: limit on the amount of lines, board isn't infinite in X direction.
-    :param spacing: the amount of spacing between letters.
+    :param word_spacing: the amount of spacing between letters.
+    :param spacing: the amount of spacing between lines of text.
     :param path: path of the file to write to, to pass to C++.
     :return: None
     """
     with open(path, 'w') as myFile:
         myFile.write("")
-    lines = cutIntoLines(text, scale, lineLengthLimit)
+    lines = cutIntoLines(text, scale, word_spacing, lineLengthLimit)
     if len(lines) > lineAmountLimit:
         print('Error: too many lines')
         return
     for line in lines:
         # print(' '.join(line))
-        newX = compileWord(' '.join(line), scale, X, Y, path)
+        newX = compileWord(' '.join(line), scale, X, Y, word_spacing, path)
         with open(path, 'a') as myFile:
             myFile.write(f"L:{round(newX, 4)}:{round(Y, 4)}:{round(X, 4)}:{round(Y - (1 + spacing) * scale, 4)}:F:\n")
         Y -= scale * (1 + spacing)
@@ -113,5 +115,5 @@ if __name__ == '__main__':
     text = 'HELLO FROM THE OTHER SIDE I MUST HAVE CALLED A THOUSAND TIMES'
     print(cutIntoLines(text, 0.05, 0.4))
     # compileWord('HELLO', 1, 10, 40, 'MyTrialFile.txt') # 8, 10, 0.5,
-    compileText(text, scale=0.05, X=-0.05, Y=0.23, lineLengthLimit=0.4, lineAmountLimit=10, spacing=0.01,
+    compileText(text, scale=0.05, X=-0.05, Y=0.23, lineLengthLimit=0.4, lineAmountLimit=10, word_spacing=0.3, spacing=0.01,
                 path='hello.txt')  #

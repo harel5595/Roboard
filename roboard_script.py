@@ -4,25 +4,11 @@ import os
 import tempfile
 from textCompiler import compileText
 
-
-DEFAULT_FONT_HEIGHT = 10
-DEFAULT_LINE_SPACING = 0.5
-DEFAULT_FIRST_LINE_X = 0
-DEFAULT_FIRST_LINE_Y = 30
-DEFAULT_LINE_LENGTH_LIMIT = 40
-DEFAULT_LINE_AMOUNT_LIMIT = 4
-DEFAULT_CALLIBRATION_OPTION, STORE_CALLIBRATION_OPTION, LOAD_CALLIBRATION_OPTION = range(3)
-
-def usage(error_string):
-	print(error_string + "\n\n")
-	print("usage!")
-
-def main(argv):
-	'''
+docstring = '''
 	NAME
 		Roboard
 	SYNOPSIS
-		Roboard [-s|f write_string] [-lc|sc callibration_path] [-v|-vv|-VV] [OPTIONS]...
+		Roboard [-s|-f|-c write_string] [-lc|-sc callibration_path] [-v|-vv|-VV] [OPTIONS]...
 	
 	DESCRIPTION
 		This function incapsulates the functionality of the Roboard (TM) module. given a 
@@ -62,6 +48,9 @@ def main(argv):
 			set the maximum length of a line to w (in centimeters) 
 			if a word has length greater than w, an exception wil be thrown
 		
+		--letter-spacing spacing
+			set the spacing between letters to be spacing (as a percentage of the height of the letters)
+
 		--line-spacing spacing
 			set the line spacing to be spacing (as a percentage of the height of the letters)
 
@@ -83,9 +72,24 @@ def main(argv):
 	EXAMPLES
 		Roboard -s "HELLO WORLD!"
 		Roboard -s "Hi, my name is Roaboard. I can write anything on the board :)" -sc "roboard_callibration.txt"
-		Roboard -f "write_text.txt" -lc "roboard_callibration.txt" --font-size 10 --line-length-limit 0.3
+		Roboard -f "write_text.txt" -lc "roboard_callibration.txt" --font-size 10 --line-length-limit 30
 	'''
 
+DEFAULT_FONT_HEIGHT = 10
+DEFAULT_LINE_SPACING = 0.5
+DEFAULT_LETTER_SPACING = 0.2
+DEFAULT_FIRST_LINE_X = -5
+DEFAULT_FIRST_LINE_Y = 30
+DEFAULT_LINE_LENGTH_LIMIT = 30
+DEFAULT_LINE_AMOUNT_LIMIT = 4
+DEFAULT_CALLIBRATION_OPTION, STORE_CALLIBRATION_OPTION, LOAD_CALLIBRATION_OPTION = range(3)
+
+def usage(error_string):
+	print(error_string + "\n\n")
+	print(docstring)
+
+def main(argv):
+	
 	def get_operand(flag, default=None, convert=None):
 		'''
 		this function returns the operand of a flag. if this couldn't retreive the operand, it returns
@@ -138,6 +142,7 @@ def main(argv):
 	# set rest of parameteres according to the command line
 	font_height = get_operand("-h", default=DEFAULT_FONT_HEIGHT, convert=float)
 	line_spacing = get_operand("--line-spacing", default=DEFAULT_LINE_SPACING, convert=float)
+	letter_spacing = get_operand("--letter-spacing", default=DEFAULT_LETTER_SPACING, convert=float)
 	first_line_x = get_operand("--first-line-X", default=DEFAULT_FIRST_LINE_X, convert=float)
 	first_line_y = get_operand("--first-line-Y", default=DEFAULT_FIRST_LINE_Y, convert=float)
 	line_length_limit = get_operand("--line-length-limit", default=DEFAULT_LINE_LENGTH_LIMIT, convert=float)
@@ -184,6 +189,7 @@ def main(argv):
 
 	print(f'Roboard.exe -f "{compilation_path}" {callibration_option_string} -starting-point 0.4065 0.1108 0.4531'+\
 		  f' -c-points 0.5750 0.1682 0.3920 0.5750 0.1682 0.6920 0.2450 0.1682 0.3920 {verbose_string}' if callibration_option in [STORE_CALLIBRATION_OPTION, DEFAULT_CALLIBRATION_OPTION] else '')
+
 	if not "--save-compilation" in argv:
 		os.close(fd)
 		# os.unlink(compilation_path)
