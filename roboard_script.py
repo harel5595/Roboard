@@ -75,8 +75,8 @@ docstring = '''
 		Roboard -f "write_text.txt" -lc "roboard_callibration.txt" --font-size 10 --line-length-limit 30
 	'''
 
-DEFAULT_FONT_HEIGHT = 10
-DEFAULT_LINE_SPACING = 0.5
+DEFAULT_FONT_HEIGHT = 7
+DEFAULT_LINE_SPACING = 0.4
 DEFAULT_LETTER_SPACING = 0.2
 DEFAULT_FIRST_LINE_X = -5
 DEFAULT_FIRST_LINE_Y = 30
