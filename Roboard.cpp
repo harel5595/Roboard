@@ -82,6 +82,9 @@ int (*MySendAngularTorqueCommand)(float Command[COMMAND_SIZE]);
 
 int (*MySendCartesianForceCommand)(float Command[COMMAND_SIZE]);
 
+float3 defaultTheta = float3{ -1.2602 ,-0.1939,-2.9917 };
+float3 defaultFingers = float3{ 6986,  6872 , 7112 };
+
 TrajectoryPoint *Float3ToCartesian(float x, float y, float z);
 
 TrajectoryPoint *Float3ToCartesian(float3 point) {
@@ -89,8 +92,10 @@ TrajectoryPoint *Float3ToCartesian(float3 point) {
 }
 
 
+
 /*
 * This func create TrajectoryPoint from Cartesian values.
+* IMPORTENT: if used without insertin theta and fingers values then default values will be used.
 * REMEMBER to free the pointer after use.
 */
 TrajectoryPoint *Float3ToCartesian(float x, float y, float z) {
@@ -105,12 +110,12 @@ TrajectoryPoint *Float3ToCartesian(float x, float y, float z) {
     pos.Y = y;
     pos.Z = z;
 
-    pos.ThetaX = -1.6782;
-    pos.ThetaY = 0.2578;
-    pos.ThetaZ = -2.9906;
-    point.Fingers.Finger1 = 6986;
-    point.Fingers.Finger2 = 6872;
-    point.Fingers.Finger3 = 7112;
+    pos.ThetaX = defaultTheta.x;
+    pos.ThetaY = defaultTheta.y;
+    pos.ThetaZ = defaultTheta.z;
+    point.Fingers.Finger1 = defaultFingers.x;
+    point.Fingers.Finger2 = defaultFingers.y;
+    point.Fingers.Finger3 = defaultFingers.z;
 
 
     point.CartesianPosition = pos;
@@ -506,13 +511,15 @@ void load_basis(vector <float3> basis, string path, int vebrose) {
 -c-normal [x] [y] [z] set the normal to be used in the calibration.
 -c-motors [HowManyMotors] [motorNumber] ... [number1] (the motors to consider in the calibration) 
 -p [strength] push strength in the calibration
+-theta [x] [y] [z] he theta to be used on the arm.
+-fingers [1] [2] [3] the position to be used on the fingers.
 -n [number] the numbers of points in a line (more will be slower, but more acurrate)
 -starting-point [x] [y] [z] the point to start from when drawing. (here to help with difficult places to draw in at the start)
 -h pring help
 ** default is to do calibration! **
 */
 // default of the starting point is - 0.4065, 0.1108, 0.4531
-int main(char ** argv, int argc) {
+int main(int argc, char ** argv) {
     int programResult, result, vebrose = 0, motorsCounter = 0, pointsInLine = 40;
     float calibrationWaitInterval = 10, calibrationBigWaitInterval = 4000, waitInterval = 2, bigWaitInterval = 300, pushStrength = 1.2;
     vector<float3> calibrationPoints;
@@ -593,11 +600,11 @@ int main(char ** argv, int argc) {
                 error = true;
                 break;
             }
-            calibrationPoints.push_back(float3{ atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]) });
+            calibrationPoints.push_back(float3{ (float)atof(argv[i + 1]), (float)atof(argv[i + 2]), (float)atof(argv[i + 3]) });
             i += 3;
-            calibrationPoints.push_back(float3{ atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]) });
+            calibrationPoints.push_back(float3{ (float)atof(argv[i + 1]), (float)atof(argv[i + 2]), (float)atof(argv[i + 3]) });
             i += 3; 
-            calibrationPoints.push_back(float3{ atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]) });
+            calibrationPoints.push_back(float3{ (float)atof(argv[i + 1]), (float)atof(argv[i + 2]), (float)atof(argv[i + 3]) });
             i += 3;
         }
         else if (!strcmp(argv[i], "-c-normal"))
@@ -607,7 +614,27 @@ int main(char ** argv, int argc) {
                 error = true;
                 break;
             }
-            calibrationNormal = float3{ atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]) };
+            calibrationNormal = float3{ (float)atof(argv[i + 1]), (float)atof(argv[i + 2]), (float)atof(argv[i + 3]) };
+            i += 3;
+        }
+        else if (!strcmp(argv[i], "-theta"))
+        {
+            if (i + 3 > argc)
+            {
+                error = true;
+                break;
+            }
+            defaultTheta = float3{ (float)atof(argv[i + 1]), (float)atof(argv[i + 2]), (float)atof(argv[i + 3]) };
+            i += 3;
+        }
+        else if (!strcmp(argv[i], "-fingers"))
+        {
+            if (i + 3 > argc)
+            {
+                error = true;
+                break;
+            }
+            defaultFingers = float3{ (float)atof(argv[i + 1]), (float)atof(argv[i + 2]), (float)atof(argv[i + 3]) };
             i += 3;
         }
         else if (!strcmp(argv[i], "-starting-point"))
@@ -617,7 +644,7 @@ int main(char ** argv, int argc) {
                 error = true;
                 break;
             }
-            startingPoint = float3{ atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]) };
+            startingPoint = float3{ (float)atof(argv[i + 1]), (float)atof(argv[i + 2]), (float)atof(argv[i + 3]) };
             i += 3;
         }
         else if (!strcmp(argv[i], "-l"))
