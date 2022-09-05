@@ -12,6 +12,7 @@ using std::vector;
 #define RIGHT_DOWN float3{0.6694,0.2565,0.4842}
 
 float3 getNormal();
+void setNormal(float3 normal);
 float3 getBaseBoard();
 void updateBasis(float3 baseBoard, float3 e1, float3 e2, float3 e3);
 

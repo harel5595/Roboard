@@ -27,12 +27,8 @@
 
 using namespace linalg::aliases;
 using namespace linalg::ostream_overloads;
-
-
 using namespace std;
 
-
-//int(*MySendBasicTrajectory)(TrajectoryPoint command);
 
 #ifdef __linux__
 void* commandLayer_handle;
@@ -86,10 +82,10 @@ int (*MySendAngularTorqueCommand)(float Command[COMMAND_SIZE]);
 
 int (*MySendCartesianForceCommand)(float Command[COMMAND_SIZE]);
 
-TrajectoryPoint *CartesianToPoint(float x, float y, float z);
+TrajectoryPoint *Float3ToCartesian(float x, float y, float z);
 
-TrajectoryPoint *CartesianToPoint(float3 point) {
-    return CartesianToPoint(point.x, point.y, point.z);
+TrajectoryPoint *Float3ToCartesian(float3 point) {
+    return Float3ToCartesian(point.x, point.y, point.z);
 }
 
 
@@ -97,7 +93,7 @@ TrajectoryPoint *CartesianToPoint(float3 point) {
 * This func create TrajectoryPoint from Cartesian values.
 * REMEMBER to free the pointer after use.
 */
-TrajectoryPoint *CartesianToPoint(float x, float y, float z) {
+TrajectoryPoint *Float3ToCartesian(float x, float y, float z) {
     TrajectoryPoint *start = new TrajectoryPoint;
     start->InitStruct();
 
@@ -127,7 +123,7 @@ TrajectoryPoint *CartesianToPoint(float x, float y, float z) {
 * This func create TrajectoryPoint from Cartesian values.
 * REMEMBER to free the pointer after use.
 */
-TrajectoryPoint *CartesianToPoint(float x, float y, float z, float thetaX, float thetaY, float thetaZ) {
+TrajectoryPoint *Float3ToCartesian(float x, float y, float z, float thetaX, float thetaY, float thetaZ) {
     TrajectoryPoint *start = new TrajectoryPoint;
     start->InitStruct();
 
@@ -151,12 +147,12 @@ TrajectoryPoint *CartesianToPoint(float x, float y, float z, float thetaX, float
     return start;
 }
 
-float3 PointToCartesian(CartesianPosition point) {
+float3 CartesianToFloat3(CartesianPosition point) {
     return float3{point.Coordinates.X, point.Coordinates.Y, point.Coordinates.Z};
 }
 
-TrajectoryPoint *CartesianToPoint(float3 point, float3 direction) {
-    return CartesianToPoint(point.x, point.y, point.z, direction.x, direction.y, direction.z);
+TrajectoryPoint *Float3ToCartesian(float3 point, float3 direction) {
+    return Float3ToCartesian(point.x, point.y, point.z, direction.x, direction.y, direction.z);
 }
 
 
@@ -166,7 +162,7 @@ TrajectoryPoint *CartesianToPoint(float3 point, float3 direction) {
 * REMEMBER to free the pointer after use.
 */
 TrajectoryPoint *
-CartesianToPoint(float x, float y, float z, float thetaX, float thetaY, float thetaZ, float finger1, float finger2,
+Float3ToCartesian(float x, float y, float z, float thetaX, float thetaY, float thetaZ, float finger1, float finger2,
                  float finger3) {
     TrajectoryPoint *start = new TrajectoryPoint;
     start->InitStruct();
@@ -191,10 +187,14 @@ CartesianToPoint(float x, float y, float z, float thetaX, float thetaY, float th
 }
 
 
-int initRobotAPI() {
+int initRobotAPI(int vebrose) {
     int result;
     commandLayer_handle = LoadLibrary(L"CommandLayerWindows.dll");
-
+    if (commandLayer_handle == 0)
+    {
+        cerr << "Could not load libery. CommandLayerWindows.dll" << endl;
+        return 1;
+    }
     MyInitAPI = (int (*)()) GetProcAddress(commandLayer_handle, "InitAPI");
     MyCloseAPI = (int (*)()) GetProcAddress(commandLayer_handle, "CloseAPI");
     MyGetCartesianForce = (int (*)(CartesianPosition &)) GetProcAddress(commandLayer_handle, "GetCartesianForce");
@@ -229,17 +229,17 @@ int initRobotAPI() {
     //If the API was loaded correctly
     if ((MyInitAPI == NULL) || (MyCloseAPI == NULL) || (MyGetDevices == NULL)
         || (MySetActiveDevice == NULL) || (MyStartForceControl == NULL)) {
-        cout << "* * *  E R R O R   D U R I N G   I N I T I A L I Z A T I O N  * * *" << endl;
+        cerr << "* * *  E R R O R   D U R I N G   I N I T I A L I Z A T I O N  * * *" << endl;
         return 0;
     } else {
         if (MySwitchTrajectoryTorque == NULL)
             cout << "* * * ERROR LOADING MySwitchTrajectoryTorque * * * " << endl;
-
-        cout << "I N I T I A L I Z A T I O N   C O M P L E T E D" << endl << endl;
+        if(vebrose >= 1)
+            cout << "I N I T I A L I Z A T I O N   C O M P L E T E D" << endl << endl;
 
         result = (*MyInitAPI)();
-
-        cout << "Initialization's result :" << result << endl;
+        if(vebrose >= 2)
+            cout << "Initialization's result :" << result << endl;
 
         KinovaDevice list[MAX_KINOVA_DEVICE];
 
@@ -247,7 +247,8 @@ int initRobotAPI() {
         int devicesCount = MyGetDevices(list, result);
 
         for (int i = 0; i < devicesCount; i++) {
-            cout << "Found a robot on the USB bus (" << list[i].SerialNumber << ")" << endl;
+            if (vebrose >= 2)
+                cout << "Found a robot on the USB bus (" << list[i].SerialNumber << ")" << endl;
 
             //Setting the current device as the active device.
             MySetActiveDevice(list[i]);
@@ -263,251 +264,20 @@ int initRobotAPI() {
     return 1;
 }
 
-// returns a velocity vector from b to a with length 1
-TrajectoryPoint operator-(const TrajectoryPoint &a, const TrajectoryPoint &b) {
-    TrajectoryPoint differenceTrajectory;
-    float len, len2;
-    float pi = 3.1415f;
 
-    differenceTrajectory.Position.CartesianPosition.X = (a.Position.CartesianPosition.X -
-                                                         b.Position.CartesianPosition.X);
-    differenceTrajectory.Position.CartesianPosition.Y = (a.Position.CartesianPosition.Y -
-                                                         b.Position.CartesianPosition.Y);
-    differenceTrajectory.Position.CartesianPosition.Z = (a.Position.CartesianPosition.Z -
-                                                         b.Position.CartesianPosition.Z);
-    len2 = pow(differenceTrajectory.Position.CartesianPosition.X, 2) +
-           pow(differenceTrajectory.Position.CartesianPosition.Y, 2) +
-           pow(differenceTrajectory.Position.CartesianPosition.Z, 2);
-    len = pow(len2, 0.5f);
-    differenceTrajectory.Position.CartesianPosition.X /= len;
-    differenceTrajectory.Position.CartesianPosition.Y /= len;
-    differenceTrajectory.Position.CartesianPosition.Z /= len;
-
-    differenceTrajectory.Position.CartesianPosition.ThetaX = (a.Position.CartesianPosition.ThetaX -
-                                                              b.Position.CartesianPosition.ThetaX);
-    differenceTrajectory.Position.CartesianPosition.ThetaY = (a.Position.CartesianPosition.ThetaY -
-                                                              b.Position.CartesianPosition.ThetaY);
-    differenceTrajectory.Position.CartesianPosition.ThetaZ = (a.Position.CartesianPosition.ThetaZ -
-                                                              b.Position.CartesianPosition.ThetaZ);
-
-    if (differenceTrajectory.Position.CartesianPosition.ThetaX > pi)
-        differenceTrajectory.Position.CartesianPosition.ThetaX -= 2 * pi;
-    else if (differenceTrajectory.Position.CartesianPosition.ThetaX < -pi)
-        differenceTrajectory.Position.CartesianPosition.ThetaX += 2 * pi;
-    if (differenceTrajectory.Position.CartesianPosition.ThetaY > pi)
-        differenceTrajectory.Position.CartesianPosition.ThetaY -= 2 * pi;
-    else if (differenceTrajectory.Position.CartesianPosition.ThetaY < -pi)
-        differenceTrajectory.Position.CartesianPosition.ThetaY += 2 * pi;
-    if (differenceTrajectory.Position.CartesianPosition.ThetaZ > pi)
-        differenceTrajectory.Position.CartesianPosition.ThetaZ -= 2 * pi;
-    else if (differenceTrajectory.Position.CartesianPosition.ThetaZ < -pi)
-        differenceTrajectory.Position.CartesianPosition.ThetaZ += 2 * pi;
-
-    differenceTrajectory.Position.Fingers.Finger1 = (a.Position.Fingers.Finger1 - b.Position.Fingers.Finger1);
-    differenceTrajectory.Position.Fingers.Finger2 = (a.Position.Fingers.Finger2 - b.Position.Fingers.Finger2);
-    differenceTrajectory.Position.Fingers.Finger3 = (a.Position.Fingers.Finger3 - b.Position.Fingers.Finger3);
-
-    return differenceTrajectory;
-}
-
-std::ostream &operator<<(std::ostream &os, const TrajectoryPoint &p) {
-    // write obj to stream
-    os << std::setprecision(2) << p.Position.CartesianPosition.X << " " << p.Position.CartesianPosition.Y << " "
-       << p.Position.CartesianPosition.Z << " "
-       << p.Position.CartesianPosition.ThetaX << " " << p.Position.CartesianPosition.ThetaY << " "
-       << p.Position.CartesianPosition.ThetaZ;
-    return os;
-}
-
-
-void PushP2P(TrajectoryPoint fromPoint, TrajectoryPoint toPoint, float x_speed, float y_force) {
-    TrajectoryPoint velocityToSend, currentPoint;
-    CartesianPosition dataPosition;
-    float pi = 3.14f;
-    float epsilon = 0.03f;
-    float y_speed, tmp_y_speed, init_y_speed;
-    float actual_force;
-    CartesianPosition data;
-
-    velocityToSend.InitStruct();
-
-    // go to fromPoint - use cartesian poition control
-    cout << "going to start position" << endl;
-    fromPoint.Position.Type = CARTESIAN_POSITION;
-    MySendBasicTrajectory(fromPoint);
-
-    // go to toPoint - use velocity control (later read torque to mediate force)
-    cout << "Starting Velocity Control - going to target point (with pressure)" << endl;
-    velocityToSend.Position.Type = CARTESIAN_VELOCITY;
-
-    // initiate y_speed based on y_force desired direction, and arbitrarily 0.01 of x_speed. Then update it based on actual force
-    init_y_speed = 0.01 * abs(x_speed) * y_force / abs(y_force);
-    y_speed = init_y_speed;
-    tmp_y_speed = y_speed;
-
-    // implement force application by velocity control
-    // send the velocity vector every 5 ms as long as we want the robot to move along that vector.
-    for (int i = 0; i < 500; i++) {
-        (*MyGetCartesianPosition)(dataPosition);
-
-        float x;
-        x = currentPoint.Position.CartesianPosition.X = dataPosition.Coordinates.X;
-        currentPoint.Position.CartesianPosition.Y = dataPosition.Coordinates.Y;
-        currentPoint.Position.CartesianPosition.Z = dataPosition.Coordinates.Z;
-        currentPoint.Position.CartesianPosition.ThetaX = dataPosition.Coordinates.ThetaX;
-        currentPoint.Position.CartesianPosition.ThetaY = dataPosition.Coordinates.ThetaY;
-        currentPoint.Position.CartesianPosition.ThetaZ = dataPosition.Coordinates.ThetaZ;
-        currentPoint.Position.Fingers.Finger1 = dataPosition.Fingers.Finger1;
-        currentPoint.Position.Fingers.Finger2 = dataPosition.Fingers.Finger2;
-        currentPoint.Position.Fingers.Finger3 = dataPosition.Fingers.Finger3;
-
-        if (abs(toPoint.Position.CartesianPosition.X - dataPosition.Coordinates.X) < epsilon &&
-            abs(toPoint.Position.CartesianPosition.Y - dataPosition.Coordinates.Y) < epsilon &&
-            abs(toPoint.Position.CartesianPosition.Z - dataPosition.Coordinates.Z) < epsilon)
-            break;
-
-        // get normalized direction vector (only X, Y, Z are normalized, not angles or fingers)
-        velocityToSend = toPoint - currentPoint;
-
-        // fix orientation of the end effoctor
-        velocityToSend.Position.CartesianPosition.ThetaX *= 1.0f;
-        velocityToSend.Position.CartesianPosition.ThetaY *= -1.0f;  // BUG??? when not negating, the arm rotates all over
-        velocityToSend.Position.CartesianPosition.ThetaZ *= 1.0f;
-
-        velocityToSend.Position.CartesianPosition.X = x_speed;
-        // TODO: calculate speed based on read torque
-        velocityToSend.Position.CartesianPosition.Y = tmp_y_speed; // push against the board
-        velocityToSend.Position.CartesianPosition.Z /= 5.0;
-
-        velocityToSend.Position.Type = CARTESIAN_VELOCITY;
-
-        // cout << "current: " << currentPoint << " target: " << toPoint << " velocity: " << velocityToSend << endl;
-        MySendBasicTrajectory(velocityToSend);
-
-        // calibrate y speed (against the board) based on current pressure
-        int result = (*MyGetCartesianForce)(data);
-        actual_force = data.Coordinates.Y;
-        if (actual_force / y_force > 10) {
-            // in case pressure is too hard already, free the pressure
-            tmp_y_speed = -1 * init_y_speed;
-            y_speed = init_y_speed;
-        } else {
-            y_speed *= y_force / actual_force;
-            tmp_y_speed = y_speed;
-        }
-
-        cout << "Forces: " << "X: " << data.Coordinates.X << " N, " << "Y: " << data.Coordinates.Y << " N, (tmp speed: "
-             << tmp_y_speed << "), " << "Z: " << data.Coordinates.Z << " N, " << endl;
-
-        Sleep(5);  // robot will persevere 5 ms in speed control
-    }
-
-    // stay at target point, but change robot back to position control (in case it matters)
-    currentPoint.Position.Type = CARTESIAN_POSITION;
-    MySendBasicTrajectory(currentPoint);
-}
 
 void MoveToPoint(float3 point) {
-    TrajectoryPoint *start = CartesianToPoint(point);
+    TrajectoryPoint *start = Float3ToCartesian(point);
     MySendBasicTrajectory(*start);
-    //free(start);
-}
-
-float3 GetNewDstByForce(float3 oldDst, float3 force) {
-    cout << force << length(force) << endl;
-    if (length(force) < 5) {
-        return oldDst;
-    }
-    return oldDst + (float3) (getNormal() * 0.0005);
+    free(start); // ??
 }
 
 float3 GetMyForce() {
     float3 force;
     CartesianPosition curr_force;
     MyGetCartesianForce(curr_force);
-    force = PointToCartesian(curr_force);
+    force = CartesianToFloat3(curr_force);
     return force;
-}
-
-void GetToPointWithForceControl(float3 dst) {
-    CartesianPosition curr_point;
-    float3 force, start_force = GetMyForce();
-    int counter = 0;
-    while (counter < 100) // need to sert maximum of moving time to be 2 seconds
-    {
-        counter++;
-        MyGetCartesianPosition(curr_point);
-        if (length(PointToCartesian(curr_point) - dst) < 0.01)// got to point
-        {
-            MyEraseAllTrajectories();
-            return; // stop the moveing
-        }
-
-        force = GetMyForce();
-        dst = GetNewDstByForce(dst, force - start_force); // change dst by the position of the board
-
-        MoveToPoint(dst);
-        Sleep(5);
-        MyEraseAllTrajectories();
-    }
-}
-
-
-void waitUntilGetToPoint(float3 wanted_pos) {
-    CartesianPosition cur_point;
-    float3 priv = float3{0, 0, 0};
-    int counter = 0;
-    cout << "dst: " << wanted_pos << endl;
-    while (true) {
-        //cout << float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } << endl;
-
-        MyGetCartesianPosition(cur_point);
-        if (length(float3{cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z} - wanted_pos) <
-            0.008 || (float3{cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z} == priv &&
-                      length(float3{cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z} -
-                             wanted_pos) < 0.01))
-            return; // Got to point
-        priv = float3{cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z};
-        //cout << "dst: " << wanted_pos << ", pos: " << float3{ cur_point.Coordinates.X, cur_point.Coordinates.Y, cur_point.Coordinates.Z } << endl;
-        TrajectoryPoint *pos = CartesianToPoint(wanted_pos);
-        MySendBasicTrajectory(*pos);
-        Sleep(2);
-        MyEraseAllTrajectories();
-        free(pos);
-
-    }
-    //CartesianPosition pos = MyGetCartesianForce();
-}
-
-float3 nextPointByForce(float3 nextPoint, float3 normalBoard) {
-    int MEASURE = 5;
-
-    float3 forceSum;
-    CartesianPosition force;
-    for (int i = 0; i < MEASURE; i++) {
-        MyGetCartesianForce(force);
-        forceSum += PointToCartesian(force);
-        Sleep(1);
-    }
-    forceSum /= MEASURE;
-
-    if (forceSum.y > 10) {
-        nextPoint.y -= 0.01;
-    } else if (forceSum.y < 5) {
-        nextPoint.y += 0.01;
-    }
-
-    return nextPoint;
-
-    //float3 force_diff = force - nowForce; //difference between what we want and what we have
-    //if (length(nowForce) > MAX_FORCE)
-    //{
-    //	perror("too much force");
-    //	exit(1);
-    //}
-    //float3 force_corr = dot(force_diff, normalBoard) * normalBoard * float3 { 0.00, 0.04, 0.00 }; //force correction, how much to move in the direction of the normal.
-    //cout <<"curr force:     " << length(nowForce) << "      curr_correction:   " << force_corr << endl;
-    //return nextPoint + force_corr;
 }
 
 float3 GetMyCommand() {
@@ -536,29 +306,41 @@ vector<float> GetMyAngularForce() {
     return motors;
 }
 
-float3 GoToTheBoard2(float3 start_point) {
-    float3 curr_point = start_point, priv_pos, priv_priv_pos, priv_priv_priv_pos, my_command, my_pos;
+float3 GoToTheBoard(float3 start_point, vector<int> effectedMotors ,float pushStrength ,float waitInterval, int vebrose) {
+    float3 curr_point = start_point;
     CartesianPosition curr_pos;
-    int counter = 0, other_counter = 0;
-    vector<float> motors;
+    int counter = 0, other_counter = 0, powersSum;
+    vector<float> motorsPowers;
     while (true) {
         other_counter++;
-        motors = GetMyAngularForce();
-        //my_force.z = 0;
-        //start_force.z = 0;
-        //cout << "command: " << my_command << ", pos: " << my_pos  << ", sub: " << abs(my_command[2] - my_pos[2]) << endl;
-        cout << "force first motor: " << motors[0] << endl;
-        if (counter > 20 && abs(motors[0]) > 1.2) {
-            cout << "found the board!" << curr_point << endl;
+        motorsPowers = GetMyAngularForce();
+        if (vebrose >= 2)
+        {
+            cout << "Forces: ";
+            for (int motorNumber : effectedMotors)
+            {
+                cout << " force motor " << motorNumber << ": " << motorsPowers[motorNumber];
+            }
+            cout << endl;
+        }
+
+        powersSum = 0;
+        for (int motorNumber : effectedMotors)
+            powersSum += abs(motorsPowers[motorNumber]); // default is only motor 0 and power limit of 1.2
+
+        if (counter > 20 && powersSum > pushStrength) {
+            
+            if(vebrose >= 2)
+                cout << "Found the board! at point: " << curr_point << endl;
             MyGetCartesianPosition(curr_pos);
 
-            return PointToCartesian(curr_pos);// +(float3)(getNormal() * 0.005);//road[road.size() - 160];
+            return CartesianToFloat3(curr_pos);// +(float3)(getNormal() * 0.005);//road[road.size() - 160];
         }
 
         MoveToPoint(curr_point);
-        Sleep(10);
+        Sleep(waitInterval); // default is 10
         MyGetCartesianPosition(curr_pos);
-        if (length(PointToCartesian(curr_pos) - curr_point) < 0.01 ||
+        if (length(CartesianToFloat3(curr_pos) - curr_point) < 0.01 ||
             other_counter >= 10) // got to the point, but not the board yet
         {
             MyEraseAllTrajectories();
@@ -572,70 +354,17 @@ float3 GoToTheBoard2(float3 start_point) {
 }
 
 
-float3 GoToTheBoard(float3 start_point) {
-    float3 start_force = GetMyForce(), curr_point = start_point, my_force, priv_pos, priv_priv_pos, priv_priv_priv_pos;
-    vector <float3> road;
-    CartesianPosition curr_pos;
-    float diff, priv_diff = 0, priv_priv_diff = 0, priv_priv_priv_diff = 0, priv_priv_priv_priv_diff = 0, priv_priv_priv_priv_priv_diff = 0;
-    int counter = 0, other_counter = 0;
-    while (true) {
-        other_counter++;
-        my_force = GetMyForce();
-        //my_force.z = 0;
-        //start_force.z = 0;
-        diff = length(start_force - my_force);
-        cout << "force diff: " << diff << "full float" << start_force - my_force << endl;
-        if (diff + priv_diff + priv_priv_diff + priv_priv_priv_diff + priv_priv_priv_priv_diff +
-            priv_priv_priv_priv_priv_diff > 4.8 && counter > 200 && diff > 0.7 && priv_diff > 0.7 &&
-            priv_priv_diff > 0.7 && priv_priv_priv_diff > 0.7 && priv_priv_priv_priv_diff > 0.7 &&
-            priv_priv_priv_priv_priv_diff > 0.7) {
-            cout << "found the board!" << curr_point << endl;
-            MyGetCartesianPosition(curr_pos);
-
-            return PointToCartesian(curr_pos);// +(float3)(getNormal() * 0.005);//road[road.size() - 160];
-        }
-
-        MoveToPoint(curr_point);
-        Sleep(3);
-        MyGetCartesianPosition(curr_pos);
-        if (length(PointToCartesian(curr_pos) - curr_point) < 0.01 ||
-            other_counter >= 15) // got to the point, but not the board yet
-        {
-            MyEraseAllTrajectories();
-            counter++;
-            other_counter = 0;
-            curr_point -= (float3) (getNormal() * 0.0002);
-            start_force = GetMyForce();
-            cout << "other point!" << curr_point << "my pos:" << PointToCartesian(curr_pos) << "other count:"
-                 << other_counter << endl;
-        }
-        priv_priv_priv_priv_priv_diff = priv_priv_priv_priv_diff;
-        priv_priv_priv_priv_diff = priv_priv_priv_diff;
-        priv_priv_priv_diff = priv_priv_diff;
-        priv_priv_diff = priv_diff;
-        priv_diff = diff;
-
-        road.push_back(curr_point);
-    }
-}
 
 
-void mainLoopForDrawLine(vector <float3> line) {
-    //cout << normalBoard << " - the normal" << endl;
-    bool finishDraw = false;
-    //cout << line[0] << endl << line[1] << endl;
-    TrajectoryPoint *pos = CartesianToPoint(line[0]);
-    MySendBasicTrajectory(*pos);
-    free(pos);
-    //waitUntilGetToPoint(line[0]);
-    Sleep(300);
-    TrajectoryPoint *priv = NULL;
+void mainLoopForDrawLine(vector <float3> line, float waitInterval, float endWaitInterval ,int vebrose) {
     for (auto point: line) {
-        TrajectoryPoint *pos = CartesianToPoint(point);
+        TrajectoryPoint *pos = Float3ToCartesian(point);
         MySendBasicTrajectory(*pos);
-        Sleep(2);
+        Sleep(waitInterval); // default is 2
+        if(vebrose >= 3)
+            cout << "Send to Robot the point: " << point << endl;
     }
-    Sleep(300);
+    Sleep(endWaitInterval); // default is 300 
 }
 
 
@@ -694,47 +423,41 @@ void drawFile(string fileName) {
     }
 }
 
-
-vector <float3> findTheBoard() {
+// default starting points float3{0.5750, 0.1682, 0.3920}, float3{0.5750, 0.1682, 0.6920}, float3{0.2450, 0.1682, 0.3920}
+vector <float3> findTheBoard(vector<float3> startingPoints, vector<int> effectedMotors, float pushStrength, float bigWaitInterval, float waitInterval, int vebrose) {
     vector <float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
-    //cout << "globs: " << basis[0] << ", " << basis[1] << ", " << basis[2] << endl;
+    
+    TrajectoryPoint *start = Float3ToCartesian(startingPoints[0]);
+    MySendBasicTrajectory(*start);
+    Sleep(bigWaitInterval); // default is 4000
+    float3 right_down = GoToTheBoard(startingPoints[0], effectedMotors, pushStrength, waitInterval, vebrose);
+    MySendBasicTrajectory(*start);
+    Sleep(bigWaitInterval);
 
-    TrajectoryPoint *start = CartesianToPoint(0.5750, 0.1682, 0.3920);
+    start = Float3ToCartesian(startingPoints[1]);
     MySendBasicTrajectory(*start);
-    Sleep(7000);
-    float3 right_down = GoToTheBoard2(float3{0.5750, 0.1682, 0.3920});
+    Sleep(bigWaitInterval);
+    float3 right_up = GoToTheBoard(startingPoints[1], effectedMotors, pushStrength, waitInterval, vebrose);
     MySendBasicTrajectory(*start);
-    Sleep(4000);
-
-    start = CartesianToPoint(0.5750, 0.1682, 0.6920);
-    MySendBasicTrajectory(*start);
-    Sleep(4000);
-    float3 right_up = GoToTheBoard2(float3{0.5750, 0.1682, 0.6920});
-    MySendBasicTrajectory(*start);
-    Sleep(4000);
+    Sleep(bigWaitInterval);
 
 
-    start = CartesianToPoint(0.2450, 0.1682, 0.3920);
+    start = Float3ToCartesian(startingPoints[2]);
     MySendBasicTrajectory(*start);
-    Sleep(4000);
-    float3 left_down = GoToTheBoard2(float3{0.2450, 0.1682, 0.3920});
+    Sleep(bigWaitInterval);
+    float3 left_down = GoToTheBoard(startingPoints[2], effectedMotors, pushStrength, waitInterval, vebrose);
     MySendBasicTrajectory(*start);
-    Sleep(4000);
+    Sleep(bigWaitInterval);
     free(start);
-
-    //basis = getNewBasis(right_down, left_down, right_up);
-    //left_down += (float3)(getNormal() * 0.2);
-    //right_down += (float3)(getNormal() * 0.2);
-    //right_up += (float3)(getNormal() * 0.2);
 
     return getNewBasis(left_down, right_down, right_up);
 }
 
 
-void save_basis(vector <float3> basis) {
+void save_basis(vector <float3> basis, string path, int vebrose) {
     ofstream myfile;
     float3 baseBoard = getBaseBoard();
-    myfile.open("basis.save");
+    myfile.open(path);
 
 
     myfile.write((char *) &(basis[0]), sizeof(float3));
@@ -742,13 +465,15 @@ void save_basis(vector <float3> basis) {
     myfile.write((char *) &(basis[2]), sizeof(float3));
     myfile.write((char *) &(baseBoard), sizeof(float3));
     myfile.close();
+    if (vebrose >= 1)
+        cout << "Saved the basis!" << endl;
 }
 
 
-void load_basis(vector <float3> basis) {
+void load_basis(vector <float3> basis, string path, int vebrose) {
     ifstream myfile;
     float3 left_down;
-    myfile.open("basis.save");
+    myfile.open(path);
 
     while (basis.size() < 3)
         basis.push_back(float3());
@@ -759,27 +484,235 @@ void load_basis(vector <float3> basis) {
     myfile.read((char *) &(left_down), sizeof(float3));
     myfile.close();
     updateBasis(left_down, basis[0], basis[1], basis[2]);
-    cout << "left down: " << left_down << ", basis[0]: " << basis[0] << ", basis[1]: " << basis[1] << ", basis[2]: "
+    if (vebrose >= 1)
+        cout << "Load the basis!" << endl;
+    if(vebrose >= 3)
+        cout << "left down: " << left_down << ", basis[0]: " << basis[0] << ", basis[1]: " << basis[1] << ", basis[2]: "
          << basis[2] << endl;
 }
 
+/*
+-v Vebrose1, -vv Vebrose 2, -VV Vebrose 3
+-f [path] path for a file to draw.
+-l [path] load a calibration.
+-s [path] save the calibration.
+-cw calibration small wait interval (effection the speed of the movment of the arm druin calibrations)
+-cW calibration big wait interval (effetion the wait between two times touching the board)
+-w normal small wait interval (effection the speed of the movment of the arm in normal drawing)
+-W normal big wait interval (effection the wait between two drawings)
+-c-points [x] [y] [z] [x1] [y1] [z1] [x2] [y2] [z2] set the starting points for the calibration.
+-c-normal [x] [y] [z] set the normal to be used in the calibration.
+-c-motors [HowManyMotors] [motorNumber] ... [number1] (the motors to consider in the calibration) 
+-p [strength] push strength in the calibration
+-starting-point [x] [y] [z] the point to start from when drawing. (here to help with difficult places to draw in at the start)
+-h pring help
+** default is to do calibration! **
+*/
+// default of the starting point is - 0.4065, 0.1108, 0.4531
+int main(char ** argv, int argc) {
+    int programResult, result, vebrose = 0, motorsCounter = 0;
+    float calibrationWaitInterval = 10, calibrationBigWaitInterval = 4000, waitInterval = 2, bigWaitInterval = 300, pushStrength = 1.2;
+    vector<float3> calibrationPoints;
+    vector<int> relevantMotors;
+    float3 calibrationNormal = float3{ 0,0,0 };
+    float3 startingPoint = float3{ 0,0,0 };
+    string loadPath = "", savePath = "", drawPath = "";
+    
+    bool error = false;
+    for (int i = 1; i < argc; i++)
+    {
+        if (!strcmp(argv[i], "-v"))
+        {
+            vebrose = 1;
+        }
+        else if (!strcmp(argv[i], "-vv"))
+        {
+            vebrose = 2;
+        }
+        else if (!strcmp(argv[i], "-VV"))
+        {
+            vebrose = 3;
+        }
+        else if (!strcmp(argv[i], "-cw"))
+        {
+            if (i + 1 > argc)
+            {
+                error = true;
+                break;
+            }
+            i++;
+            calibrationWaitInterval = atof(argv[i]);
+        }
+        else if (!strcmp(argv[i], "-cW"))
+        {
+            if (i + 1 > argc)
+            {
+                error = true;
+                break;
+            }
+            i++;
+            calibrationBigWaitInterval = atof(argv[i]);
+        }
+        else if (!strcmp(argv[i], "-w"))
+        {
+            if (i + 1 > argc)
+            {
+                error = true;
+                break;
+            }
+            i++;
+            waitInterval = atof(argv[i]);
+        }
+        else if (!strcmp(argv[i], "-W"))
+        {
+            if (i + 1 > argc)
+            {
+                error = true;
+                break;
+            }
+            i++;
+            bigWaitInterval = atof(argv[i]);
+        }
+        else if (!strcmp(argv[i], "-p"))
+        {
+            if (i + 1 > argc)
+            {
+                error = true;
+                break;
+            }
+            i++;
+            pushStrength = atof(argv[i]);
+        }
+        else if (!strcmp(argv[i], "-c-points"))
+        {
+            if (i + 9 > argc)
+            {
+                error = true;
+                break;
+            }
+            calibrationPoints.push_back(float3{ atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]) });
+            i += 3;
+            calibrationPoints.push_back(float3{ atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]) });
+            i += 3; 
+            calibrationPoints.push_back(float3{ atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]) });
+            i += 3;
+        }
+        else if (!strcmp(argv[i], "-c-normal"))
+        {
+            if (i + 3 > argc)
+            {
+                error = true;
+                break;
+            }
+            calibrationNormal = float3{ atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]) };
+            i += 3;
+        }
+        else if (!strcmp(argv[i], "-starting-point"))
+        {
+            if (i + 3 > argc)
+            {
+                error = true;
+                break;
+            }
+            startingPoint = float3{ atof(argv[i + 1]), atof(argv[i + 2]), atof(argv[i + 3]) };
+            i += 3;
+        }
+        else if (!strcmp(argv[i], "-l"))
+        {
+            if (i + 1 > argc)
+            {
+                error = true;
+                break;
+            }
+            i++;
+            loadPath = argv[i];
+        }
+        else if (!strcmp(argv[i], "-f"))
+        {
+        if (i + 1 > argc)
+        {
+            error = true;
+            break;
+        }
+        i++;
+        drawPath = argv[i];
+        }
+        else if (!strcmp(argv[i], "-s"))
+        {
+            if (i + 1 > argc)
+            {
+                error = true;
+                break;
+            }
+            i++;
+            savePath = argv[i];
+        }
+        else if (!strcmp(argv[i], "-c-motors"))
+        {
+            if (i + 1 > argc)
+            {
+                error = true;
+                break;
+            }
+            i++;
+            motorsCounter = atoi(argv[i]);
+            if (i + motorsCounter > argc)
+            {
+                error = true;
+                break;
+            }
+            i++;
+            for (int j = 0; j < motorsCounter; j++)
+            {
+                relevantMotors.push_back(atoi(argv[i + j]));
+            }
+            i += motorsCounter - 1;
+        }
+        else if (!strcmp(argv[i], "-h"))
+        {
+            // TODO: print help
+            return 0;
+        }
+        else
+        {
+            error = true;
+            break;
+        }
+    }
 
-int main(void) {
-    int programResult, result;
+    if (error)
+    {
+        cerr << "ERROR: in the parameters." << endl;
+        return 1;
+    }
 
     if (!initRobotAPI())
         return 1;
-
     MyMoveHome();
-    //MySetTorqueSafetyFactor(15);
     //MyInitFingers();
     Sleep(5000);
-    vector <float3> basis;// = findTheBoard();
-    //save_basis(basis);
-    load_basis(basis);
-    TrajectoryPoint *start = CartesianToPoint(0.4065, 0.1108, 0.4531);
-    MySendBasicTrajectory(*start);
-    Sleep(5000);
+
+    vector <float3> basis;
+    if (loadPath.empty())
+    {
+        if (calibrationNormal != float3{ 0,0,0 })
+            setNormal(calibrationNormal);
+        basis = findTheBoard(calibrationPoints,relevantMotors, pushStrength, calibrationBigWaitInterval, calibrationWaitInterval, vebrose);
+        if(!savePath.empty())
+            save_basis(basis, savePath, vebrose);
+    }
+    else
+    {
+        load_basis(basis, loadPath, vebrose);
+    }
+    
+    if (startingPoint != float3{ 0,0,0 })
+    {
+        TrajectoryPoint* start = Float3ToCartesian(startingPoint);
+        MySendBasicTrajectory(*start);
+        Sleep(5000);
+    }
+    
     drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\hello.txt"));
 
     disconnectFromRobot();
