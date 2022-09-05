@@ -786,9 +786,9 @@ int main(void)
 	//MySetTorqueSafetyFactor(15);
 	//MyInitFingers();
 	Sleep(5000);
-	vector<float3> basis;// = findTheBoard();
- 	//save_basis(basis);
-	load_basis(basis);
+	vector<float3> basis = findTheBoard();
+ 	save_basis(basis);
+	//load_basis(basis);
 	TrajectoryPoint* start = CartesianToPoint(0.4065, 0.1108, 0.4531);
 	MySendBasicTrajectory(*start);
 	Sleep(5000);
