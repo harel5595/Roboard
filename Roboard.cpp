@@ -364,6 +364,8 @@ void mainLoopForDrawLine(vector <float3> line, float waitInterval, float endWait
         if(vebrose >= 3)
             cout << "Send to Robot the point: " << point << endl;
     }
+    if (vebrose >= 2)
+        cout << "Finish a line!" << endl;
     Sleep(endWaitInterval); // default is 300 
 }
 
@@ -376,7 +378,7 @@ void disconnectFromRobot() {
 
 // L:cord_x,cord_y:cord_x,cord_y:T/F
 
-void drawFile(string fileName) {
+void drawFile(string fileName, float waitInterval, float bigWaitInterval, int pointsInLine, int vebrose) {
     ifstream MyReadFile(fileName);
     string line;
     string delimiter = ":";
@@ -400,25 +402,25 @@ void drawFile(string fileName) {
             float2 first_point = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
             float2 second_point = float2{std::stof(line_splited[3]), std::stof(line_splited[4])};
             bool drawing = line_splited[5] == "T";
-            mainLoopForDrawLine(getLine(first_point, second_point, 40, drawing));
+            mainLoopForDrawLine(getLine(first_point, second_point, pointsInLine, drawing), waitInterval, bigWaitInterval, vebrose);
             //cout << "first point:" << first_point << " , second:" << second_point << endl;
         } else if (line_splited[0] == "C") {
             float2 center = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
             float radios = std::stof(line_splited[3]);
             float start_angle = std::stof(line_splited[4]);
             float draw_angle = std::stof(line_splited[5]);
-            mainLoopForDrawLine(getCircArc(center, radios, start_angle, draw_angle, 100));
+            mainLoopForDrawLine(getCircArc(center, radios, start_angle, draw_angle, pointsInLine * 2), waitInterval, bigWaitInterval, vebrose);
         } else if (line_splited[0] == "Q") {
             float2 first_point = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
             float2 second_point = float2{std::stof(line_splited[3]), std::stof(line_splited[4])};
             float2 third_point = float2{std::stof(line_splited[5]), std::stof(line_splited[6])};
-            mainLoopForDrawLine(getQuadBezierCurve(first_point, second_point, third_point, 100));
+            mainLoopForDrawLine(getQuadBezierCurve(first_point, second_point, third_point, pointsInLine * 2), waitInterval, bigWaitInterval, vebrose);
         } else if (line_splited[0] == "B") {
             float2 first_point = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
             float2 second_point = float2{std::stof(line_splited[3]), std::stof(line_splited[4])};
             float2 third_point = float2{std::stof(line_splited[5]), std::stof(line_splited[6])};
             float2 fourth_point = float2{std::stof(line_splited[7]), std::stof(line_splited[8])};
-            mainLoopForDrawLine(getCubicBezierCurve(first_point, second_point, third_point, fourth_point, 100));
+            mainLoopForDrawLine(getCubicBezierCurve(first_point, second_point, third_point, fourth_point, pointsInLine * 2), waitInterval, bigWaitInterval, vebrose);
         }
     }
 }
@@ -504,13 +506,14 @@ void load_basis(vector <float3> basis, string path, int vebrose) {
 -c-normal [x] [y] [z] set the normal to be used in the calibration.
 -c-motors [HowManyMotors] [motorNumber] ... [number1] (the motors to consider in the calibration) 
 -p [strength] push strength in the calibration
+-n [number] the numbers of points in a line (more will be slower, but more acurrate)
 -starting-point [x] [y] [z] the point to start from when drawing. (here to help with difficult places to draw in at the start)
 -h pring help
 ** default is to do calibration! **
 */
 // default of the starting point is - 0.4065, 0.1108, 0.4531
 int main(char ** argv, int argc) {
-    int programResult, result, vebrose = 0, motorsCounter = 0;
+    int programResult, result, vebrose = 0, motorsCounter = 0, pointsInLine = 40;
     float calibrationWaitInterval = 10, calibrationBigWaitInterval = 4000, waitInterval = 2, bigWaitInterval = 300, pushStrength = 1.2;
     vector<float3> calibrationPoints;
     vector<int> relevantMotors;
@@ -627,6 +630,16 @@ int main(char ** argv, int argc) {
             i++;
             loadPath = argv[i];
         }
+        else if (!strcmp(argv[i], "-n"))
+        {
+        if (i + 1 > argc)
+        {
+            error = true;
+            break;
+        }
+        i++;
+        pointsInLine = atoi(argv[i]);
+        }
         else if (!strcmp(argv[i], "-f"))
         {
         if (i + 1 > argc)
@@ -686,10 +699,9 @@ int main(char ** argv, int argc) {
         return 1;
     }
 
-    if (!initRobotAPI())
+    if (!initRobotAPI(vebrose))
         return 1;
     MyMoveHome();
-    //MyInitFingers();
     Sleep(5000);
 
     vector <float3> basis;
@@ -697,6 +709,15 @@ int main(char ** argv, int argc) {
     {
         if (calibrationNormal != float3{ 0,0,0 })
             setNormal(calibrationNormal);
+        if (calibrationPoints.size() != 3)
+        {
+            cerr << "ERROR: try to calibraite and didn't set calibration points." << endl;
+            return 1;
+        }
+        if (relevantMotors.size() == 0)
+        {
+            relevantMotors.push_back(0);
+        }
         basis = findTheBoard(calibrationPoints,relevantMotors, pushStrength, calibrationBigWaitInterval, calibrationWaitInterval, vebrose);
         if(!savePath.empty())
             save_basis(basis, savePath, vebrose);
@@ -713,8 +734,10 @@ int main(char ** argv, int argc) {
         Sleep(5000);
     }
     
-    drawFile(string("C:\\Users\\Administrator\\EyalHarelJonathan\\hello.txt"));
+    if(!drawPath.empty())
+        drawFile(drawPath, waitInterval, bigWaitInterval, pointsInLine, vebrose);
 
+    if (vebrose >= 1)
+        cout << "Done!" << endl;
     disconnectFromRobot();
-
 }
