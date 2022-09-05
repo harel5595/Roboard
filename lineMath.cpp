@@ -40,6 +40,10 @@ void updateBasis(float3 baseBoard, float3 e1, float3 e2, float3 e3)
 	glob_e3 = e3;
 }
 
+void setNormal(float3 normal)
+{
+	glob_e3 = normal;
+}
 
 float3 getNormal()
 {
