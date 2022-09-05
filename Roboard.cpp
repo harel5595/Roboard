@@ -82,7 +82,7 @@ int (*MySendAngularTorqueCommand)(float Command[COMMAND_SIZE]);
 
 int (*MySendCartesianForceCommand)(float Command[COMMAND_SIZE]);
 
-float3 defaultTheta = float3{ -1.2602 ,-0.1939,-2.9917 };
+float3 defaultTheta = float3{ -1.4648 ,-0.1016,-2.8996 };
 float3 defaultFingers = float3{ 6986,  6872 , 7112 };
 
 TrajectoryPoint *Float3ToCartesian(float x, float y, float z);
@@ -758,7 +758,7 @@ int main(int argc, char ** argv) {
     {
         TrajectoryPoint* start = Float3ToCartesian(startingPoint);
         MySendBasicTrajectory(*start);
-        Sleep(5000);
+        Sleep(7000);
     }
     
     if(!drawPath.empty())
