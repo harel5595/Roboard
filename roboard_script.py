@@ -81,7 +81,7 @@ DEFAULT_LETTER_SPACING = 0.2
 DEFAULT_FIRST_LINE_X = -5
 DEFAULT_FIRST_LINE_Y = 30
 DEFAULT_LINE_LENGTH_LIMIT = 30
-DEFAULT_LINE_AMOUNT_LIMIT = 4
+DEFAULT_LINE_AMOUNT_LIMIT = 3
 DEFAULT_CALLIBRATION_OPTION, STORE_CALLIBRATION_OPTION, LOAD_CALLIBRATION_OPTION = range(3)
 
 def usage(error_string):
@@ -161,7 +161,7 @@ def main(argv):
 		else:
 			fd, compilation_path = tempfile.mkstemp()
 		compileText(write_string, font_height/100.0, first_line_x/100.0, first_line_y/100.0,\
-					line_length_limit/100.0, line_amount_limit, line_spacing, compilation_path)
+					line_length_limit/100.0, line_amount_limit, letter_spacing, line_spacing, compilation_path)
 	
 
 	##############################################
@@ -186,9 +186,9 @@ def main(argv):
 	## when not debugging should be os.system()
 	with open(compilation_path, "r") as my_file:
 		print(my_file.read())
-
+    
 	print(f'Roboard.exe -f "{compilation_path}" {callibration_option_string} -starting-point 0.4065 0.1108 0.4531'+\
-		  f' -c-points 0.5750 0.1682 0.3920 0.5750 0.1682 0.6920 0.2450 0.1682 0.3920 {verbose_string}' if callibration_option in [STORE_CALLIBRATION_OPTION, DEFAULT_CALLIBRATION_OPTION] else '')
+		  (f' -c-points 0.5750 0.1682 0.3920 0.5750 0.1682 0.6920 0.2450 0.1682 0.3920 {verbose_string}' if callibration_option in [STORE_CALLIBRATION_OPTION, DEFAULT_CALLIBRATION_OPTION] else ''))
 
 	if not "--save-compilation" in argv:
 		os.close(fd)

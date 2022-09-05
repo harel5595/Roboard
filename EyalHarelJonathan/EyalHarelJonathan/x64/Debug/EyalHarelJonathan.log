@@ -1,1 +1,40 @@
-﻿  EyalHarelJonathan.vcxproj -> C:\Users\Administrator\EyalHarelJonathan\EyalHarelJonathan\x64\Debug\EyalHarelJonathan.exe
+﻿  Roboard.cpp
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(85,56): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(334,56): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(346,15): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(368,15): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(374,11): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(435,41): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(435,52): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(435,64): warning C4305: 'argument': truncation from 'double' to 'const T'
+          with
+          [
+              T=float
+          ]
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(439,11): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(442,11): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(446,11): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(449,11): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(454,11): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(457,11): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(524,135): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(554,43): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(564,46): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(574,32): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(584,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(594,32): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(523,24): warning C4101: 'result': unreferenced local variable
+C:\Users\Administrator\EyalHarelJonathan\Roboard.cpp(523,9): warning C4101: 'programResult': unreferenced local variable
+  EyalHarelJonathan.vcxproj -> C:\Users\Administrator\EyalHarelJonathan\EyalHarelJonathan\x64\Debug\EyalHarelJonathan.exe
