@@ -71,9 +71,7 @@ def cutIntoLines(text, scale, lineLimit):
     currLine = []
     currLineLength = 0
     for word in words:
-        print(f'hello! : CL: {currLine}, CLL: {currLineLength}, w: {word}')
         if currLineLength + wordLength(word, scale) > lineLimit:
-            print(f'hello! : CL: {currLine}, CLL: {currLineLength}, w: {word}')
             lines.append(currLine)
             currLine = []
             currLineLength = 0

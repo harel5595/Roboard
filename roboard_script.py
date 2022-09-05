@@ -1,6 +1,7 @@
 #!/bin/python3
 import sys
 import os
+import tempfile
 from textCompiler import compileText
 
 
@@ -10,7 +11,7 @@ DEFAULT_FIRST_LINE_X = 0
 DEFAULT_FIRST_LINE_Y = 30
 DEFAULT_LINE_LENGTH_LIMIT = 40
 DEFAULT_LINE_AMOUNT_LIMIT = 4
-DEFAULT_CALLIBRATION_OPTION, STORE_CALLIBRATION_OPTION, LOAD_CALLIBRATION_OPTION = range(2)
+DEFAULT_CALLIBRATION_OPTION, STORE_CALLIBRATION_OPTION, LOAD_CALLIBRATION_OPTION = range(3)
 
 def usage(error_string):
 	print(error_string + "\n\n")
@@ -21,7 +22,7 @@ def main(argv):
 	NAME
 		Roboard
 	SYNOPSIS
-		Roboard [-s|f write_string] [-lc|sc callibration_path] [OPTIONS]...
+		Roboard [-s|f write_string] [-lc|sc callibration_path] [-v|-vv|-VV] [OPTIONS]...
 	
 	DESCRIPTION
 		This function incapsulates the functionality of the Roboard (TM) module. given a 
@@ -42,7 +43,7 @@ def main(argv):
 			use this flag if you want to save the compilation product to a file at compilation_path. the
 			intended use is without the -c option
 
-		-lc callibartion_path
+		-lc callibration_path
 			if you have a file containing a previous relevant callibration (for example, after using the -s option)
 			you can skip the callibration phase and just use the measurments from that file.
 
@@ -51,6 +52,9 @@ def main(argv):
 		
 		if none of lc|sc are used, the callibration phase will not be skipped, but the measurements will not be saved anywhere.
 		
+		-v|-vv|-VV
+			verbose options
+
 		--font-size h
 			set maximal height of letters to h (in centimeters)
 
@@ -97,7 +101,7 @@ def main(argv):
 	##############################################
 	
 	# set write string:
-	if sum("-s" in argv, "-f" in argv, "-c" in argv) != 1:
+	if sum(("-s" in argv, "-f" in argv, "-c" in argv)) != 1:
 		usage("you must use exactly one of -s|-f|-c.")
 		return -1
 	if "-s" in argv:
@@ -122,13 +126,15 @@ def main(argv):
 
 
 	# set callibration option
-	if not ("-lc" in argv or "-sc" in argv):
-		callibration_option = DEFAULT_CALLIBRATION_OPTION
 	if "-lc" in argv and "-sc" in argv:
 		usage("you may use at most one of -lc|-sc.")
 		return -1
-	callibration_option = STORE_CALLIBRATION_OPTION if "-sc" in argv else LOAD_CALLIBRATION_OPTION
 
+	if not ("-lc" in argv or "-sc" in argv):
+		callibration_option = DEFAULT_CALLIBRATION_OPTION
+	else:
+		callibration_option = STORE_CALLIBRATION_OPTION if "-sc" in argv else LOAD_CALLIBRATION_OPTION
+	callibration_path = get_operand("-lc") or get_operand("-sc")
 	# set rest of parameteres according to the command line
 	font_height = get_operand("-h", default=DEFAULT_FONT_HEIGHT, convert=float)
 	line_spacing = get_operand("--line-spacing", default=DEFAULT_LINE_SPACING, convert=float)
@@ -148,19 +154,39 @@ def main(argv):
 				usage("must provide a compilation path to save compilation output to")
 				return -1
 		else:
-			fd, compilation_path = mkstmp()
-		compileText(write_string, font_height, first_line_x, first_line_y,\
-					line_length_limit, line_amount_limit, line_spacing, compilation_path)
+			fd, compilation_path = tempfile.mkstemp()
+		compileText(write_string, font_height/100.0, first_line_x/100.0, first_line_y/100.0,\
+					line_length_limit/100.0, line_amount_limit, line_spacing, compilation_path)
 	
 
 	##############################################
 	############ robot movement phase ############
 	##############################################
 
-	# use roboard.cpp to move robot
+	#generatin the exection string
+	## callibration
+	if callibration_option == LOAD_CALLIBRATION_OPTION:
+		callibration_option_string = f'-l "{callibration_path}"'
+	elif callibration_option == STORE_CALLIBRATION_OPTION:
+		callibration_option_string = f'-s "{callibration_path}"'
+	else:
+		callibration_option_string = ''
 
+	## verbose options
+	verbose_string = '-VV' if '-VV' in argv else\
+					 '-vv' if '-vv' in argv else\
+					 '-v' if '-v' in argv else ''
+
+	# use Roboard.cpp to move robot
+	## when not debugging should be os.system()
+	with open(compilation_path, "r") as my_file:
+		print(my_file.read())
+
+	print(f'Roboard.exe -f "{compilation_path}" {callibration_option_string} -starting-point 0.4065, 0.1108, 0.4531'+\
+		  f' -c-points 0.5750, 0.1682, 0.3920 0.5750, 0.1682, 0.6920 0.2450, 0.1682, 0.3920 {verbose_string}')
 	if not "--save-compilation" in argv:
-		os.unlink(fd)
+		os.close(fd)
+		# os.unlink(compilation_path)
 
 
 if __name__ == "__main__":
