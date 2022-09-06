@@ -185,9 +185,10 @@ def main(argv):
 	# use Roboard.cpp to move robot
 	## when not debugging should be os.system()
 	with open(compilation_path, "r") as my_file:
-		print(my_file.read())
+		pass
+        #print(my_file.read())
     
-	print(f'Roboard.exe -f "{compilation_path}" {callibration_option_string} -starting-point 0.2445 0.1996 0.6027'+\
+	os.system(f'Roboard.exe -f "{compilation_path}" {callibration_option_string} -n 100 -starting-point 0.2445 0.1996 0.6027'+\
 		  (f' -c-points 0.5750 0.1682 0.3920 0.5750 0.1682 0.6920 0.2450 0.1682 0.3920 {verbose_string}' if callibration_option in [STORE_CALLIBRATION_OPTION, DEFAULT_CALLIBRATION_OPTION] else ''))
 
 	if not "--save-compilation" in argv:

@@ -534,8 +534,8 @@ void loadBasis(vector <float3> basis, string path, int vebrose) {
 -h pring help
 */
 int main(int argc, char ** argv) {
-    int programResult, result, vebrose = 0, motorsCounter = 0, pointsInLine = 40;
-    float calibrationWaitInterval = 10, calibrationBigWaitInterval = 4000, waitInterval = 2, bigWaitInterval = 300, pushStrength = 1.2;
+    int programResult, result, vebrose = 0, motorsCounter = 0, pointsInLine = 100;
+    float calibrationWaitInterval = 10, calibrationBigWaitInterval = 4000, waitInterval = 4, bigWaitInterval = 300, pushStrength = 1.2;
     vector<float3> calibrationPoints;
     vector<int> relevantMotors;
     float3 calibrationNormal = float3{ 0,0,0 };
