@@ -1,40 +1,4 @@
-#include "linalg.h"
-#include <fstream>
-#include <iostream>
-#include "KinovaTypes.h"
-//#include <stdlib.h>
-#include <stdio.h>
-
-#ifdef __linux__
-#include <dlfcn.h>
-#include <vector>
-#include <stdio.h>
-#include <unistd.h>
-#include "Kinova.API.CommLayerUbuntu.h"
-#include "Kinova.API.UsbCommandLayerUbuntu.h"
-#elif _WIN32
-#include <time.h>
-#include <fstream>
-#include <Windows.h>
-#include "CommunicationLayer.h"
-#include "CommandLayer.h"
-#include <conio.h>
-#include <iomanip>
-#include "lineMath.h"
-#endif
-
-#define MAX_FORCE 17
-
-using namespace linalg::aliases;
-using namespace linalg::ostream_overloads;
-using namespace std;
-
-
-#ifdef __linux__
-void* commandLayer_handle;
-#elif _WIN32
-HINSTANCE commandLayer_handle;
-#endif
+#include "Roboard.h"
 
 //Function pointers to the functions we need
 int (*MyInitAPI)();
@@ -85,8 +49,12 @@ int (*MySendCartesianForceCommand)(float Command[COMMAND_SIZE]);
 float3 defaultTheta = float3{ -1.4648 ,-0.1016,-2.8996 };
 float3 defaultFingers = float3{ 6986,  6872 , 7112 };
 
-TrajectoryPoint *Float3ToCartesian(float x, float y, float z);
 
+/*
+* Translate a float3 point into TrajectoryPoint pointer.
+* NEED to free in the end!
+* There will be default values for the theta and the fingers!!
+*/
 TrajectoryPoint *Float3ToCartesian(float3 point) {
     return Float3ToCartesian(point.x, point.y, point.z);
 }
@@ -152,10 +120,16 @@ TrajectoryPoint *Float3ToCartesian(float x, float y, float z, float thetaX, floa
     return start;
 }
 
+/*
+* Translate a CartesianPosition into a float3 of the position. (lose the theta and the fingers position)
+*/
 float3 CartesianToFloat3(CartesianPosition point) {
     return float3{point.Coordinates.X, point.Coordinates.Y, point.Coordinates.Z};
 }
-
+/*
+* Translate a point and direction to TrafictoryPoint.
+* THIS WILL have default value in the fingers.
+*/
 TrajectoryPoint *Float3ToCartesian(float3 point, float3 direction) {
     return Float3ToCartesian(point.x, point.y, point.z, direction.x, direction.y, direction.z);
 }
@@ -191,7 +165,11 @@ Float3ToCartesian(float x, float y, float z, float thetaX, float thetaY, float t
     return start;
 }
 
-
+/*
+* The first method need to be called.
+* creating all the needed methods from the libery used.
+* conneceting with the robot.
+*/
 int initRobotAPI(int vebrose) {
     int result;
     commandLayer_handle = LoadLibrary(L"CommandLayerWindows.dll");
@@ -270,13 +248,20 @@ int initRobotAPI(int vebrose) {
 }
 
 
-
+/*
+* Using SendBasicTrajectory by with float3.
+* THIS WILL USE default values for the thea and the fingers!!
+*/
 void MoveToPoint(float3 point) {
     TrajectoryPoint *start = Float3ToCartesian(point);
     MySendBasicTrajectory(*start);
     free(start); // ??
 }
 
+/*
+* Get the force of the robot in the x, y,z in a shape of float3.
+* NOT RECOMMENDED: this can be very inaccurate, recommed to use the GetMyAngularForce function.
+*/
 float3 GetMyForce() {
     float3 force;
     CartesianPosition curr_force;
@@ -285,18 +270,26 @@ float3 GetMyForce() {
     return force;
 }
 
+/*
+* Get the command on the robot in a float3 (of the position).
+*/
 float3 GetMyCommand() {
     CartesianPosition pos;
     MyGetCartesianCommand(pos);
     return float3{pos.Coordinates.X, pos.Coordinates.Y, pos.Coordinates.Z};
 }
-
+/*
+* Get the position of the robot in a float3.
+*/
 float3 GetMyPosition() {
     CartesianPosition pos;
     MyGetCartesianPosition(pos);
     return float3{pos.Coordinates.X, pos.Coordinates.Y, pos.Coordinates.Z};
 }
 
+/*
+* This is easy access to the force on the motors in the shape of a vector. 
+*/
 vector<float> GetMyAngularForce() {
     AngularPosition pos;
     MyGetAngularForce(pos);
@@ -311,6 +304,12 @@ vector<float> GetMyAngularForce() {
     return motors;
 }
 
+
+/*
+* Used in the calibration process.
+* from the strting point going to the board (in the direction of the normal - defined in the lineMath.cpp, can be seted and accessed by functions).
+* stopping when the sum of the strength on the effected motors is bigger then the pushStrength.
+*/
 float3 GoToTheBoard(float3 start_point, vector<int> effectedMotors ,float pushStrength ,float waitInterval, int vebrose) {
     float3 curr_point = start_point;
     CartesianPosition curr_pos;
@@ -360,7 +359,9 @@ float3 GoToTheBoard(float3 start_point, vector<int> effectedMotors ,float pushSt
 
 
 
-
+/*
+* Get a line as a sequence of a float3 points, and going to them one by one.
+*/
 void mainLoopForDrawLine(vector <float3> line, float waitInterval, float endWaitInterval ,int vebrose) {
     for (auto point: line) {
         TrajectoryPoint *pos = Float3ToCartesian(point);
@@ -374,15 +375,18 @@ void mainLoopForDrawLine(vector <float3> line, float waitInterval, float endWait
     Sleep(endWaitInterval); // default is 300 
 }
 
-
+/*
+* Disconnect form the robot in a safe way.
+*/
 void disconnectFromRobot() {
     MyCloseAPI();
 }
 
 
 
-// L:cord_x,cord_y:cord_x,cord_y:T/F
-
+/*
+* Reading a file with the format of drawing, and draw by it. (and the basis that loaded).
+*/
 void drawFile(string fileName, float waitInterval, float bigWaitInterval, int pointsInLine, int vebrose) {
     ifstream MyReadFile(fileName);
     string line;
@@ -430,7 +434,12 @@ void drawFile(string fileName, float waitInterval, float bigWaitInterval, int po
     }
 }
 
-// default starting points float3{0.5750, 0.1682, 0.3920}, float3{0.5750, 0.1682, 0.6920}, float3{0.2450, 0.1682, 0.3920}
+/*
+* This is used in the calibration.
+* This function using the normal (not have to be the real normal, can be only in the general direction of the board) 
+* to go in the direction of the board from the three starting points. 
+* and return the 
+*/
 vector <float3> findTheBoard(vector<float3> startingPoints, vector<int> effectedMotors, float pushStrength, float bigWaitInterval, float waitInterval, int vebrose) {
     vector <float3> basis = getNewBasis(LEFT_DOWN, RIGHT_DOWN, LEFT_UP);
     
@@ -460,8 +469,10 @@ vector <float3> findTheBoard(vector<float3> startingPoints, vector<int> effected
     return getNewBasis(left_down, right_down, right_up);
 }
 
-
-void save_basis(vector <float3> basis, string path, int vebrose) {
+/*
+This function saving the basis of the board in a file.
+*/
+void saveBasis(vector <float3> basis, string path, int vebrose) {
     ofstream myfile;
     float3 baseBoard = getBaseBoard();
     myfile.open(path);
@@ -476,8 +487,10 @@ void save_basis(vector <float3> basis, string path, int vebrose) {
         cout << "Saved the basis!" << endl;
 }
 
-
-void load_basis(vector <float3> basis, string path, int vebrose) {
+/*
+* This function is for loading a basis for the board from a file.
+*/
+void loadBasis(vector <float3> basis, string path, int vebrose) {
     ifstream myfile;
     float3 left_down;
     myfile.open(path);
@@ -499,8 +512,14 @@ void load_basis(vector <float3> basis, string path, int vebrose) {
 }
 
 /*
--v Vebrose1, -vv Vebrose 2, -VV Vebrose 3
--f [path] path for a file to draw.
+* The main function to use for drawing and calibration the robot.
+* all the options are from the command line. (there will not be input mid-run).
+* the default state is with calibration for the robot, and it will not be saved.
+* OPTIONS:
+-v Vebrose - print actions.
+-vv Vebrose2 - print more actions. 
+-VV Vebrose3 - print everything.
+-f [path] path for a file to draw. (if not used will not draw anything).
 -l [path] load a calibration.
 -s [path] save the calibration.
 -cw calibration small wait interval (effection the speed of the movment of the arm druin calibrations)
@@ -516,9 +535,7 @@ void load_basis(vector <float3> basis, string path, int vebrose) {
 -n [number] the numbers of points in a line (more will be slower, but more acurrate)
 -starting-point [x] [y] [z] the point to start from when drawing. (here to help with difficult places to draw in at the start)
 -h pring help
-** default is to do calibration! **
 */
-// default of the starting point is - 0.4065, 0.1108, 0.4531
 int main(int argc, char ** argv) {
     int programResult, result, vebrose = 0, motorsCounter = 0, pointsInLine = 40;
     float calibrationWaitInterval = 10, calibrationBigWaitInterval = 4000, waitInterval = 2, bigWaitInterval = 300, pushStrength = 1.2;
@@ -710,7 +727,7 @@ int main(int argc, char ** argv) {
         }
         else if (!strcmp(argv[i], "-h"))
         {
-            // TODO: print help
+            cout << "* The main function to use for drawing and calibration the robot.\n* all the options are from the command line. (there will not be input mid - run).\n* the default state is with calibration for the robot, and it will not be saved.\n* OPTIONS:\n-v Vebrose - print actions.\n-vv Vebrose2 - print more actions.\n-VV Vebrose3 - print everything.\n-f [path] path for a file to draw. (if not used will not draw anything).\n-l [path] load a calibration.\n-s [path] save the calibration.\n-cw calibration small wait interval(effection the speed of the movment of the arm druin calibrations).\n-cW calibration big wait interval(effetion the wait between two times touching the board)\n-w normal small wait interval(effection the speed of the movment of the arm in normal drawing)\n-W normal big wait interval(effection the wait between two drawings)\n-c-points [x] [y] [z] [x1] [y1] [z1] [x2] [y2] [z2] set the starting points for the calibration.\n-c-normal [x] [y] [z] set the normal to be used in the calibration.\n-c-motors [HowManyMotors] [motorNumber] ... [number1] (the motors to consider in the calibration)\n-p [strength] push strength in the calibration\n-theta [x] [y] [z] he theta to be used on the arm.\n-fingers [1] [2] [3] the position to be used on the fingers.\n-n [number] the numbers of points in a line (more will be slower, but more acurrate)\n-starting-point [x] [y] [z] the point to start from when drawing. (here to help with difficult places to draw in at the start)\n-h pring help" << endl;
             return 0;
         }
         else
@@ -747,11 +764,11 @@ int main(int argc, char ** argv) {
         }
         basis = findTheBoard(calibrationPoints,relevantMotors, pushStrength, calibrationBigWaitInterval, calibrationWaitInterval, vebrose);
         if(!savePath.empty())
-            save_basis(basis, savePath, vebrose);
+            saveBasis(basis, savePath, vebrose);
     }
     else
     {
-        load_basis(basis, loadPath, vebrose);
+        loadBasis(basis, loadPath, vebrose);
     }
     
     if (startingPoint != float3{ 0,0,0 })
