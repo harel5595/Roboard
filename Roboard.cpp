@@ -338,7 +338,7 @@ float3 GoToTheBoard(float3 start_point, vector<int> effectedMotors ,float pushSt
                 cout << "Found the board! at point: " << curr_point << endl;
             MyGetCartesianPosition(curr_pos);
 
-            return CartesianToFloat3(curr_pos);// +(float3)(getNormal() * 0.005);//road[road.size() - 160];
+            return CartesianToFloat3(curr_pos);
         }
 
         MoveToPoint(curr_point);
@@ -352,7 +352,6 @@ float3 GoToTheBoard(float3 start_point, vector<int> effectedMotors ,float pushSt
             other_counter = 0;
             curr_point -= (float3) (getNormal() * 0.0002);
 
-            //cout << "other point!" << curr_point << "my pos:" << PointToCartesian(curr_pos) << "other count:" << other_counter << endl;
         }
     }
 }
@@ -400,7 +399,6 @@ void drawFile(string fileName, float waitInterval, float bigWaitInterval, int po
         std::string token;
         while ((pos = line.find(delimiter)) != std::string::npos) {
             token = line.substr(0, pos);
-            //std::cout << token << std::endl;
             line_splited.push_back(token);
             line.erase(0, pos + delimiter.length());
         }
@@ -412,7 +410,6 @@ void drawFile(string fileName, float waitInterval, float bigWaitInterval, int po
             float2 second_point = float2{std::stof(line_splited[3]), std::stof(line_splited[4])};
             bool drawing = line_splited[5] == "T";
             mainLoopForDrawLine(getLine(first_point, second_point, pointsInLine, drawing), waitInterval, bigWaitInterval, vebrose);
-            //cout << "first point:" << first_point << " , second:" << second_point << endl;
         } else if (line_splited[0] == "C") {
             float2 center = float2{std::stof(line_splited[1]), std::stof(line_splited[2])};
             float radios = std::stof(line_splited[3]);
