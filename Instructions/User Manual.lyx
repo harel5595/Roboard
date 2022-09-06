@@ -1,0 +1,197 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{culmus}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language hebrew
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2cm
+\topmargin 2cm
+\rightmargin 3cm
+\bottommargin 3cm
+\headheight 2cm
+\headsep 2cm
+\footskip 3cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+
+\lang english
+Roboard User Manual
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+Welcome to Roboard, the robotic board-writing hand.
+ Setting up is fairly easy, and drawing is done in the following steps:
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+The default option for running the program is the 
+\begin_inset Quotes eld
+\end_inset
+
+roboard_script.py
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+ 
+\end_layout
+
+\begin_layout Section
+
+\lang english
+Installation
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+First, make sure you have 
+\begin_inset CommandInset href
+LatexCommand href
+name "kinova"
+target "https://drive.google.com/file/d/1UEQAow0XLcVcPCeQfHK9ERBihOCclkJ9/view"
+literal "false"
+
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+Install our library:
+\end_layout
+
+\begin_layout Section
+
+\lang english
+Roboard_script.py
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+This is the regular way of interacting with our program.
+ There are dozens of useful flags, but the general use is upon inputting
+ a string of legal charachters, the robotic arm prints them on the board.
+\end_layout
+
+\begin_layout Section
+
+\lang english
+textCompiler.py
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+First, we have to compile some text into instructions using 
+\begin_inset Quotes eld
+\end_inset
+
+textCompiler.py
+\begin_inset Quotes erd
+\end_inset
+
+, and then run
+\begin_inset Quotes erd
+\end_inset
+
+Roboard.cpp
+\begin_inset Quotes erd
+\end_inset
+
+, and give it the complied text file.
+\begin_inset Newline newline
+\end_inset
+
+Converts between strings of text to basic robot line instructions.
+ This is similar to how code is compiled to binary.
+ These instructions however, are also human readable.
+ The lines are stored in a format similar to SVG paths, and the compiler
+ is technically only here for comfort, we compiled a lot of instructions
+ by hand.
+ We also created our own font, so that we could convert characters into
+ their own sets of lines.
+\end_layout
+
+\end_body
+\end_document
