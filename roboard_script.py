@@ -1,4 +1,3 @@
-#!/bin/python3
 import sys
 import os
 import tempfile
@@ -54,6 +53,9 @@ docstring = '''
 		--line-spacing spacing
 			set the line spacing to be spacing (as a percentage of the height of the letters)
 
+		-percision p
+			set the amount of points along every curve to p. this essentially trades speed for percision.
+
 		--line-amount-limit L
 			set the maximum amount of lines to L. this doesn't actually alter the output, but if your text doesn't
 			comply with this restriction, an exception will be thrown and the robot will not perform any commands.
@@ -73,15 +75,23 @@ docstring = '''
 		Roboard -s "HELLO WORLD!"
 		Roboard -s "Hi, my name is Roaboard. I can write anything on the board :)" -sc "roboard_callibration.txt"
 		Roboard -f "write_text.txt" -lc "roboard_callibration.txt" --font-size 10 --line-length-limit 30
+	
+	IMPORTANT
+		this script assumes that you follow the correc foramt. any deveation will cause unexpected behavoir
 	'''
+
+######################
+###### DEFAULTS ######
+######################
 
 DEFAULT_FONT_HEIGHT = 7
 DEFAULT_LINE_SPACING = 0.4
 DEFAULT_LETTER_SPACING = 0.2
 DEFAULT_FIRST_LINE_X = -5
 DEFAULT_FIRST_LINE_Y = 30
-DEFAULT_LINE_LENGTH_LIMIT = 30
-DEFAULT_LINE_AMOUNT_LIMIT = 3
+DEFAULT_LINE_LENGTH_LIMIT = 50
+DEFAULT_LINE_AMOUNT_LIMIT = 4
+DEFAULT_PERCISION = 50
 DEFAULT_CALLIBRATION_OPTION, STORE_CALLIBRATION_OPTION, LOAD_CALLIBRATION_OPTION = range(3)
 
 def usage(error_string):
@@ -147,7 +157,7 @@ def main(argv):
 	first_line_y = get_operand("--first-line-Y", default=DEFAULT_FIRST_LINE_Y, convert=float)
 	line_length_limit = get_operand("--line-length-limit", default=DEFAULT_LINE_LENGTH_LIMIT, convert=float)
 	line_amount_limit = get_operand("--line-amount-limit", default=DEFAULT_LINE_AMOUNT_LIMIT, convert=int)
-	
+	percision = get_operand("-percision", default=DEFAULT_PERCISION, convert=float)
 	
 	##############################################
 	############# compile text phase #############
@@ -183,15 +193,11 @@ def main(argv):
 					 '-v' if '-v' in argv else ''
 
 	# use Roboard.cpp to move robot
-	## when not debugging should be os.system()
-	with open(compilation_path, "r") as my_file:
-		pass
-        #print(my_file.read())
     
-	os.system(f'Roboard.exe -f "{compilation_path}" {callibration_option_string} -n 100 -starting-point 0.2445 0.1996 0.6027'+\
-		  (f' -c-points 0.5750 0.1682 0.3920 0.5750 0.1682 0.6920 0.2450 0.1682 0.3920 {verbose_string}' if callibration_option in [STORE_CALLIBRATION_OPTION, DEFAULT_CALLIBRATION_OPTION] else ''))
+	print(f'Roboard.exe -f "{compilation_path}" {callibration_option_string} -n {percision} {verbose_string} -starting-point 0.2445 0.1996 0.6027'+\
+		  (f' -c-points 0.5750 0.1682 0.3920 0.5750 0.1682 0.6920 0.2450 0.1682 0.3920' if callibration_option in [STORE_CALLIBRATION_OPTION, DEFAULT_CALLIBRATION_OPTION] else ''))
 
-	if not "--save-compilation" in argv:
+	if not skip_compile and not "--save-compilation" in argv:
 		os.close(fd)
 		# os.unlink(compilation_path)
 

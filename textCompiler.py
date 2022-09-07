@@ -80,6 +80,8 @@ def cutIntoLines(text, scale, word_spacing, lineLimit):
         currLineLength += wordLength(word, scale, word_spacing)
     if currLine:
         lines.append(currLine)
+    if not lines[0]:
+        lines = lines[1:]
     return lines
 
 
@@ -112,8 +114,8 @@ def compileText(text, scale, X, Y, lineLengthLimit, lineAmountLimit, word_spacin
 
 
 if __name__ == '__main__':
-    text = 'HELLO FROM THE OTHER SIDE I MUST HAVE CALLED A THOUSAND TIMES'
-    print(cutIntoLines(text, 0.05, 0.4))
+    text = 'I AM A BEAUTIFUL ROBOT'
+    #print(cutIntoLines(text, 0.05, 0.2, 1))
     # compileWord('HELLO', 1, 10, 40, 'MyTrialFile.txt') # 8, 10, 0.5,
-    compileText(text, scale=0.05, X=-0.05, Y=0.23, lineLengthLimit=0.4, lineAmountLimit=10, word_spacing=0.3, spacing=0.01,
+    compileText(text, scale=0.07, X=-0.05, Y=0.23, lineLengthLimit=0.5, lineAmountLimit=8, word_spacing=0.2, spacing=0.4,
                 path='hello.txt')  #
