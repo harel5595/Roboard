@@ -143,7 +143,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\alphabet.cpp" />
     <ClCompile Include="..\..\lineMath.cpp" />
     <ClCompile Include="..\..\Roboard.cpp" />
   </ItemGroup>

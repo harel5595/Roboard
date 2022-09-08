@@ -18,9 +18,6 @@
     <ClCompile Include="..\..\lineMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\alphabet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Roboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

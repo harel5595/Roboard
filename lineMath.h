@@ -15,9 +15,8 @@ float3 getNormal();
 void setNormal(float3 normal);
 float3 getBaseBoard();
 void updateBasis(float3 baseBoard, float3 e1, float3 e2, float3 e3);
-
-
 vector<float3> getNewBasis(float3 baseBoard, float3 XBoard, float3 YBoard);
+
 vector<float3> getLine(float2 pos1_2D, float2 pos2_2D, int numOfPoints, bool drawing);
 float3 translateToBoardCoordinates(float3 v);
 vector<float3> getCircArc(float2 center, float rad, float alpha0, float angle, int numOfPoints);
