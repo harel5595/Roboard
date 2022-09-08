@@ -5,9 +5,9 @@ from textCompiler import compileText
 
 docstring = '''
 	NAME
-		Roboard
+		roboard_script
 	SYNOPSIS
-		Roboard [-s|-f|-c write_string] [-lc|-sc callibration_path] [-v|-vv|-VV] [OPTIONS]...
+		python roboard_script [-s|-f|-c write_string] [-lc|-sc callibration_path] [-v|-vv|-VV] [OPTIONS]...
 	
 	DESCRIPTION
 		This function incapsulates the functionality of the Roboard (TM) module. given a 
@@ -71,6 +71,9 @@ docstring = '''
 		is done propely the x axis is parallel to the ground and point to the right, and the y axis is 
 		perpendicular to it and points upwards.
 
+		-d
+			debug option. runs normally but prints the command line to roboard instead of running it
+
 	EXAMPLES
 		Roboard -s "HELLO WORLD!"
 		Roboard -s "Hi, my name is Roaboard. I can write anything on the board :)" -sc "roboard_callibration.txt"
@@ -91,7 +94,7 @@ DEFAULT_FIRST_LINE_X = -5
 DEFAULT_FIRST_LINE_Y = 30
 DEFAULT_LINE_LENGTH_LIMIT = 50
 DEFAULT_LINE_AMOUNT_LIMIT = 4
-DEFAULT_PERCISION = 50
+DEFAULT_PERCISION = 100
 DEFAULT_CALLIBRATION_OPTION, STORE_CALLIBRATION_OPTION, LOAD_CALLIBRATION_OPTION = range(3)
 
 def usage(error_string):
@@ -193,8 +196,8 @@ def main(argv):
 					 '-v' if '-v' in argv else ''
 
 	# use Roboard.cpp to move robot
-    
-	print(f'Roboard.exe -f "{compilation_path}" {callibration_option_string} -n {percision} {verbose_string} -starting-point 0.2445 0.1996 0.6027'+\
+    operation = print if "-d" in argv else os.system
+	operation(f'Roboard.exe -f "{compilation_path}" {callibration_option_string} -n {percision} {verbose_string} -starting-point 0.2445 0.1996 0.6027'+\
 		  (f' -c-points 0.5750 0.1682 0.3920 0.5750 0.1682 0.6920 0.2450 0.1682 0.3920' if callibration_option in [STORE_CALLIBRATION_OPTION, DEFAULT_CALLIBRATION_OPTION] else ''))
 
 	if not skip_compile and not "--save-compilation" in argv:

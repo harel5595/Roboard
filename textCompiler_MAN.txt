@@ -1,0 +1,34 @@
+NAME
+        textCompiler
+    
+    SYNOPSIS
+        python textCompiler.py write_string text_height X Y line_length_limit line_amount word_spacing spacing compile_path
+
+    DESCRIPTION
+        this script compiles text accordind to the given parameters
+
+    ARGUMENTS
+        write_string
+            string of text to compile
+
+        text_height
+            height of text on the board (in csntimeters)
+
+        X, Y
+            coordinates of starting point of first line (bottom left)
+
+        line_length_limit
+            bound of length (in centimeters) of the lines. for some reason this isn't accurate. it still cuts lines according to the number but it is not exactly in centimeters.
+            due to time shortage we were not able to denug this in time for submission
+
+        line_amount
+            the bound on the total amount of lines. this will still compile but will let you know if you passed the amount of lines
+        
+        word_spacing
+            spacing between letters (in centimeters)
+
+        spacing
+            spacing between lines
+
+        compile_path
+            path to write compiled file to. this will overwrite anything in that path
